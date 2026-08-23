@@ -4,7 +4,7 @@ import AdminPanel, { formatarDataBR } from './components/AdminPanel';
 import LoginModal from './components/LoginModal';
 import Footer from './components/Footer';
 import logoImg from './assets/logo.jpg';
-import { User, MapPin, Clock, Calendar, Filter, Layers, AlertCircle } from 'lucide-react';
+import { User, MapPin, Clock, Calendar, Filter, Layers, AlertCircle, ChevronDown, ChevronUp } from 'lucide-react';
 
 const FAIXAS_JUDO = [
   { nome: 'Faixa Branca', hex: '#FFFFFF', borda: '#CCCCCC' },
@@ -55,6 +55,7 @@ export default function App() {
   
   const [filtroFaixa, setFiltroFaixa] = useState('Todas');
   const [filtroIdade, setFiltroIdade] = useState('Todas');
+  const [atletaExpandido, setAtletaExpandido] = useState(null);
 
   const [atletas, setAtletas] = useState(() => {
     const saved = localStorage.getItem('nagashima_atletas');
@@ -136,6 +137,10 @@ export default function App() {
     setActivePage('home');
   };
 
+  const toggleExpandirAtleta = (id) => {
+    setAtletaExpandido(atletaExpandido === id ? null : id);
+  };
+
   const faixasDisponiveis = FAIXAS_JUDO.filter(f => {
     const nomeBase = f.nome.split(' ')[1] || f.nome;
     return atletas.some(a => a.graduacao.toLowerCase().includes(nomeBase.toLowerCase()));
@@ -157,7 +162,6 @@ export default function App() {
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100 font-sans flex flex-col justify-between">
       <div>
-        {/* Passando o configSede para conectar as redes sociais */}
         <Navbar 
           activePage={activePage} 
           setActivePage={setActivePage} 
@@ -168,14 +172,14 @@ export default function App() {
         <main className="max-w-7xl mx-auto px-4 py-6">
           {activePage === 'home' && (
             <div className="space-y-12">
-              <section className="relative rounded-2xl bg-gradient-to-r from-zinc-900 via-zinc-900 to-red-950/40 border border-zinc-800 p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8 shadow-2xl overflow-hidden">
+              <section className="relative rounded-2xl bg-gradient-to-r from-zinc-900 via-zinc-900 to-red-950/40 border border-zinc-800 p-6 sm:p-12 flex flex-col md:flex-row items-center justify-between gap-8 shadow-2xl overflow-hidden">
                 <div className="max-w-2xl space-y-4 text-center md:text-left">
                   <span className="inline-block bg-red-600/20 text-red-500 text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full border border-red-600/30">
                     Tradição & Disciplina
                   </span>
 
                   <div className="space-y-1">
-                    <h1 className="text-3xl sm:text-5xl font-black uppercase text-white tracking-wider" style={{ fontFamily: "'Shojumaru', 'Cinzel', serif" }}>
+                    <h1 className="text-2xl sm:text-5xl font-black uppercase text-white tracking-wider">
                       Associação Nagashima
                     </h1>
                     <p className="text-xs sm:text-sm font-semibold tracking-widest text-red-500 uppercase">
@@ -183,30 +187,30 @@ export default function App() {
                     </p>
                   </div>
 
-                  <h2 className="text-lg md:text-2xl font-bold uppercase tracking-tight text-zinc-200 pt-2">
+                  <h2 className="text-base sm:text-2xl font-bold uppercase tracking-tight text-zinc-200 pt-2">
                     Formando Campeões Dentro e Fora do Tatame
                   </h2>
-                  <p className="text-zinc-400 text-sm md:text-base leading-relaxed">
+                  <p className="text-zinc-400 text-xs sm:text-base leading-relaxed">
                     Portal oficial da Associação Nagashima. Acompanhe o progresso dos nossos atletas, exames de faixa e próximos campeonatos.
                   </p>
 
                   <div className="pt-2 flex flex-wrap gap-3 justify-center md:justify-start">
                     <button 
                       onClick={() => setActivePage('atletas')}
-                      className="bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-3 rounded-lg uppercase text-xs tracking-wider transition-all shadow-lg shadow-red-600/30"
+                      className="bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-3 rounded-lg uppercase text-xs tracking-wider transition-all shadow-lg shadow-red-600/30 w-full sm:w-auto"
                     >
                       Ver Atletas
                     </button>
                     <button 
                       onClick={() => setActivePage('eventos')}
-                      className="bg-zinc-800 hover:bg-zinc-700 text-white font-bold px-6 py-3 rounded-lg uppercase text-xs tracking-wider transition-all border border-zinc-700"
+                      className="bg-zinc-800 hover:bg-zinc-700 text-white font-bold px-6 py-3 rounded-lg uppercase text-xs tracking-wider transition-all border border-zinc-700 w-full sm:w-auto"
                     >
                       Próximos Eventos
                     </button>
                   </div>
                 </div>
 
-                <div className="w-48 h-48 md:w-64 md:h-64 rounded-full border-4 border-red-600 bg-white p-2 shadow-2xl flex-shrink-0">
+                <div className="w-36 h-36 sm:w-64 sm:h-64 rounded-full border-4 border-red-600 bg-white p-2 shadow-2xl flex-shrink-0">
                   <img 
                     src={logoImg} 
                     alt="Logo Nagashima" 
@@ -216,7 +220,7 @@ export default function App() {
               </section>
 
               <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-xl hover:border-red-600/50 transition-colors space-y-2">
+                <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-xl space-y-2">
                   <h3 className="text-base font-bold text-white uppercase flex items-center gap-2">
                     🥋 Exames de Faixa
                   </h3>
@@ -225,7 +229,7 @@ export default function App() {
                   </p>
                 </div>
 
-                <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-xl hover:border-red-600/50 transition-colors space-y-2">
+                <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-xl space-y-2">
                   <h3 className="text-base font-bold text-white uppercase flex items-center gap-2">
                     🏆 Quadro de Medalhas
                   </h3>
@@ -234,7 +238,7 @@ export default function App() {
                   </p>
                 </div>
 
-                <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-xl hover:border-red-600/50 transition-colors space-y-2">
+                <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-xl space-y-2">
                   <h3 className="text-base font-bold text-white uppercase flex items-center gap-2">
                     <MapPin size={18} className="text-red-500" /> Nossa Sede
                   </h3>
@@ -242,7 +246,7 @@ export default function App() {
                   <p className="text-zinc-400 text-xs">{configSede.bairroCidade}</p>
                 </div>
 
-                <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-xl hover:border-red-600/50 transition-colors space-y-2">
+                <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-xl space-y-2">
                   <h3 className="text-base font-bold text-white uppercase flex items-center gap-2">
                     <Clock size={18} className="text-red-500" /> Horários de Treino
                   </h3>
@@ -269,14 +273,14 @@ export default function App() {
           {activePage === 'atletas' && (
             <div className="space-y-6">
               <div className="flex items-center justify-between flex-wrap gap-4">
-                <h2 className="text-2xl font-black uppercase text-white tracking-wider flex items-center gap-2">
+                <h2 className="text-xl sm:text-2xl font-black uppercase text-white tracking-wider flex items-center gap-2">
                   <User className="text-red-500" /> Atletas Cadastrados na Associação
                 </h2>
-                <span className="text-xs text-zinc-500">Passe o mouse no card para ver o perfil expandido</span>
+                <span className="text-xs text-zinc-500">Toque no card para expandir o perfil</span>
               </div>
 
-              <div className="bg-zinc-900/90 border border-zinc-800 rounded-xl p-4 flex flex-wrap items-center justify-start gap-6 shadow-lg">
-                <div className="flex items-center gap-2">
+              <div className="bg-zinc-900/90 border border-zinc-800 rounded-xl p-4 flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center justify-start gap-4 shadow-lg">
+                <div className="flex items-center justify-between sm:justify-start gap-2">
                   <span className="text-xs font-bold text-zinc-400 uppercase flex items-center gap-1.5">
                     <Layers size={14} className="text-red-500" /> Faixa:
                   </span>
@@ -284,9 +288,9 @@ export default function App() {
                   <select 
                     value={filtroFaixa} 
                     onChange={e => setFiltroFaixa(e.target.value)}
-                    className="bg-zinc-950 border border-zinc-800 text-white text-xs font-semibold rounded-lg p-2 focus:border-red-600 outline-none shadow-inner"
+                    className="bg-zinc-950 border border-zinc-800 text-white text-xs font-semibold rounded-lg p-2 focus:border-red-600 outline-none w-full sm:w-auto"
                   >
-                    <option value="Todas">Todas as Faixas ({atletas.length})</option>
+                    <option value="Todas">Todas ({atletas.length})</option>
                     {faixasDisponiveis.map(f => {
                       const nomeCurto = f.nome.split(' ')[1] || f.nome;
                       const totalNaFaixa = atletas.filter(a => a.graduacao.toLowerCase().includes(nomeCurto.toLowerCase())).length;
@@ -299,7 +303,7 @@ export default function App() {
                   </select>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center justify-between sm:justify-start gap-2">
                   <span className="text-xs font-bold text-zinc-400 uppercase flex items-center gap-1.5">
                     <Filter size={14} className="text-red-500" /> Categoria:
                   </span>
@@ -307,7 +311,7 @@ export default function App() {
                   <select 
                     value={filtroIdade} 
                     onChange={e => setFiltroIdade(e.target.value)}
-                    className="bg-zinc-950 border border-zinc-800 text-white text-xs font-semibold rounded-lg p-2 focus:border-red-600 outline-none shadow-inner"
+                    className="bg-zinc-950 border border-zinc-800 text-white text-xs font-semibold rounded-lg p-2 focus:border-red-600 outline-none w-full sm:w-auto"
                   >
                     <option value="Todas">Todas as Categorias</option>
                     <option value="infantil">Infantil (até 12 anos)</option>
@@ -323,85 +327,97 @@ export default function App() {
                   Nenhum atleta encontrado para os filtros selecionados.
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-                  {atletasFiltrados.map(a => (
-                    <div 
-                      key={a.id} 
-                      className="group bg-zinc-900 border border-zinc-800 hover:border-red-600 rounded-2xl p-6 transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-red-600/10 cursor-pointer overflow-hidden"
-                    >
-                      <div className="flex items-center justify-between gap-4">
-                        <div className="flex items-center gap-4">
-                          {a.foto ? (
-                            <img 
-                              src={a.foto} 
-                              alt={a.nome} 
-                              className="w-16 h-16 rounded-full object-cover border-2 border-red-600 group-hover:scale-105 transition-transform shadow-md" 
-                            />
-                          ) : (
-                            <div className="w-16 h-16 rounded-full bg-zinc-800 border-2 border-zinc-700 flex items-center justify-center font-bold text-lg text-white">
-                              {a.nome.substring(0, 2).toUpperCase()}
-                            </div>
-                          )}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+                  {atletasFiltrados.map(a => {
+                    const isExpanded = atletaExpandido === a.id;
+                    return (
+                      <div 
+                        key={a.id} 
+                        onClick={() => toggleExpandirAtleta(a.id)}
+                        className={`bg-zinc-900 border ${isExpanded ? 'border-red-600' : 'border-zinc-800'} rounded-2xl p-5 transition-all duration-300 shadow-xl cursor-pointer overflow-hidden`}
+                      >
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                          <div className="flex items-center gap-4 w-full sm:w-auto">
+                            {a.foto ? (
+                              <img 
+                                src={a.foto} 
+                                alt={a.nome} 
+                                className="w-16 h-16 rounded-full object-cover border-2 border-red-600 shadow-md flex-shrink-0" 
+                              />
+                            ) : (
+                              <div className="w-16 h-16 rounded-full bg-zinc-800 border-2 border-zinc-700 flex items-center justify-center font-bold text-lg text-white flex-shrink-0">
+                                {a.nome.substring(0, 2).toUpperCase()}
+                              </div>
+                            )}
 
-                          <div className="space-y-1">
-                            <h3 className="font-extrabold text-lg text-white group-hover:text-red-500 transition-colors">
-                              {a.nome}
-                            </h3>
-                            <ImagemFaixa nomeFaixa={a.graduacao} />
-                            <p className="text-xs text-zinc-400 font-medium pt-0.5">
-                              {a.idade} anos • {a.peso}
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center gap-2 text-xs font-extrabold bg-zinc-950/60 px-3 py-1.5 rounded-lg border border-zinc-800">
-                          <span className="text-yellow-500">🥇 {a.medalhas?.ouro || 0}</span>
-                          <span className="text-zinc-300">🥈 {a.medalhas?.prata || 0}</span>
-                          <span className="text-amber-600">🥉 {a.medalhas?.bronze || 0}</span>
-                        </div>
-                      </div>
-
-                      <div className="mt-3 border-t border-zinc-800/80 pt-3 text-xs text-zinc-300">
-                        <strong className="text-red-500 font-bold">Conquistas:</strong> {a.titulos || 'Atleta em formação'}
-                      </div>
-
-                      <div className="max-h-0 opacity-0 group-hover:max-h-[500px] group-hover:opacity-100 transition-all duration-500 ease-in-out border-t border-red-600/40 mt-4 pt-4 text-xs">
-                        <div className="flex flex-col sm:flex-row items-start justify-between gap-6">
-                          <div className="space-y-3 flex-1 text-left">
-                            <div>
-                              <strong className="text-red-500 uppercase font-bold tracking-wider block mb-1">
-                                🎯 Estilo de Luta & Características:
-                              </strong>
-                              <p className="text-zinc-300 leading-relaxed text-xs">
-                                {a.caracteristicas || 'Nenhuma observação técnica cadastrada.'}
-                              </p>
-                            </div>
-
-                            <div>
-                              <strong className="text-red-500 uppercase font-bold tracking-wider block mb-1">
-                                📜 Títulos & Conquistas:
-                              </strong>
-                              <p className="text-zinc-300 leading-relaxed text-xs">
-                                {a.titulos || 'Atleta cadastrado na associação.'}
+                            <div className="space-y-1">
+                              <h3 className="font-extrabold text-lg text-white">
+                                {a.nome}
+                              </h3>
+                              <ImagemFaixa nomeFaixa={a.graduacao} />
+                              <p className="text-xs text-zinc-400 font-medium pt-0.5">
+                                {a.idade} anos • {a.peso}
                               </p>
                             </div>
                           </div>
 
-                          {a.fotoCorpo ? (
-                            <div className="w-full sm:w-48 h-64 rounded-xl overflow-hidden border-2 border-red-600/80 shadow-2xl flex-shrink-0 bg-zinc-950">
-                              <img src={a.fotoCorpo} alt={`Perfil em pé ${a.nome}`} className="w-full h-full object-cover" />
+                          <div className="flex items-center justify-between w-full sm:w-auto gap-3">
+                            <div className="flex items-center gap-2 text-xs font-extrabold bg-zinc-950/80 px-3 py-1.5 rounded-lg border border-zinc-800">
+                              <span className="text-yellow-500">🥇 {a.medalhas?.ouro || 0}</span>
+                              <span className="text-zinc-300">🥈 {a.medalhas?.prata || 0}</span>
+                              <span className="text-amber-600">🥉 {a.medalhas?.bronze || 0}</span>
                             </div>
-                          ) : (
-                            <div className="w-full sm:w-48 h-64 rounded-xl border border-dashed border-zinc-800 flex flex-col items-center justify-center text-zinc-600 text-center p-3 flex-shrink-0">
-                              <User size={24} className="opacity-40 mb-1" />
-                              <span className="text-[10px]">Sem foto em pé</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
 
-                    </div>
-                  ))}
+                            <button className="text-zinc-400 hover:text-white p-1">
+                              {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="mt-3 border-t border-zinc-800/80 pt-3 text-xs text-zinc-300">
+                          <strong className="text-red-500 font-bold">Conquistas:</strong> {a.titulos || 'Atleta em formação'}
+                        </div>
+
+                        {/* Conteúdo Detalhado Expandível */}
+                        {isExpanded && (
+                          <div className="border-t border-red-600/40 mt-4 pt-4 text-xs animate-fadeIn">
+                            <div className="flex flex-col sm:flex-row items-start justify-between gap-6">
+                              <div className="space-y-3 flex-1 text-left w-full">
+                                <div>
+                                  <strong className="text-red-500 uppercase font-bold tracking-wider block mb-1">
+                                    🎯 Estilo de Luta & Características:
+                                  </strong>
+                                  <p className="text-zinc-300 leading-relaxed text-xs">
+                                    {a.caracteristicas || 'Nenhuma observação técnica cadastrada.'}
+                                  </p>
+                                </div>
+
+                                <div>
+                                  <strong className="text-red-500 uppercase font-bold tracking-wider block mb-1">
+                                    📜 Títulos & Conquistas:
+                                  </strong>
+                                  <p className="text-zinc-300 leading-relaxed text-xs">
+                                    {a.titulos || 'Atleta cadastrado na associação.'}
+                                  </p>
+                                </div>
+                              </div>
+
+                              {a.fotoCorpo ? (
+                                <div className="w-full sm:w-48 h-64 rounded-xl overflow-hidden border-2 border-red-600/80 shadow-2xl flex-shrink-0 bg-zinc-950">
+                                  <img src={a.fotoCorpo} alt={`Perfil em pé ${a.nome}`} className="w-full h-full object-cover" />
+                                </div>
+                              ) : (
+                                <div className="w-full sm:w-48 h-48 sm:h-64 rounded-xl border border-dashed border-zinc-800 flex flex-col items-center justify-center text-zinc-600 text-center p-3 flex-shrink-0">
+                                  <User size={24} className="opacity-40 mb-1" />
+                                  <span className="text-[10px]">Sem foto em pé</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -410,25 +426,25 @@ export default function App() {
           {/* ABA PÚBLICA DE EVENTOS */}
           {activePage === 'eventos' && (
             <div className="space-y-6">
-              <h2 className="text-2xl font-black uppercase text-white tracking-wider flex items-center gap-2">
+              <h2 className="text-xl sm:text-2xl font-black uppercase text-white tracking-wider flex items-center gap-2">
                 <Calendar className="text-red-500" /> Calendário de Eventos & Torneios
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {eventos.map(e => (
-                  <div key={e.id} className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 space-y-3 shadow-xl hover:border-red-600/50 transition-colors">
-                    <div className="flex justify-between items-start gap-4">
+                  <div key={e.id} className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 sm:p-6 space-y-3 shadow-xl">
+                    <div className="flex flex-col sm:flex-row justify-between items-start gap-2">
                       <div>
-                        <h3 className="font-bold text-lg text-white">{e.nome}</h3>
+                        <h3 className="font-bold text-base sm:text-lg text-white">{e.nome}</h3>
                         <p className="text-xs text-zinc-400 mt-1">📍 <strong>Local:</strong> {e.local}</p>
                       </div>
 
-                      <div className="flex flex-col items-end gap-1 flex-shrink-0">
+                      <div className="flex flex-col items-start sm:items-end gap-1 flex-shrink-0">
                         {e.realizado ? (
-                          <span className="bg-red-950/90 text-red-400 border border-red-800/80 text-[11px] font-black uppercase px-3 py-1 rounded-full shadow-sm">
+                          <span className="bg-red-950/90 text-red-400 border border-red-800/80 text-[10px] sm:text-[11px] font-black uppercase px-3 py-1 rounded-full shadow-sm">
                             EVENTO ENCERRADO
                           </span>
                         ) : (
-                          <span className="bg-emerald-950/90 text-emerald-400 border border-emerald-800/80 text-[11px] font-black uppercase px-3 py-1 rounded-full shadow-sm animate-pulse">
+                          <span className="bg-emerald-950/90 text-emerald-400 border border-emerald-800/80 text-[10px] sm:text-[11px] font-black uppercase px-3 py-1 rounded-full shadow-sm">
                             📅 {formatarDataBR(e.data)}
                           </span>
                         )}
