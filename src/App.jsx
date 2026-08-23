@@ -6,6 +6,8 @@ import Footer from './components/Footer';
 import logoImg from './assets/logo.jpg';
 import { User, MapPin, Clock, Calendar, Filter, Layers, AlertCircle, ChevronDown, ChevronUp } from 'lucide-react';
 
+const AVATAR_PADRAO = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80";
+
 const FAIXAS_JUDO = [
   { nome: 'Faixa Branca', hex: '#FFFFFF', borda: '#CCCCCC' },
   { nome: 'Faixa Cinza', hex: '#9CA3AF', borda: '#6B7280' },
@@ -68,7 +70,7 @@ export default function App() {
         graduacao: 'Faixa Preta (1º ao 5º Dan)',
         caracteristicas: 'Especialista em Harai Goshi e Seoi Nage. Excelente tempo de reação no kumi-kata.',
         titulos: 'Campeão Estadual 2025, Vice-campeão Brasileiro 2024',
-        foto: '',
+        foto: AVATAR_PADRAO,
         fotoCorpo: '',
         medalhas: { ouro: 5, prata: 2, bronze: 1 }
       }
@@ -330,6 +332,8 @@ export default function App() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
                   {atletasFiltrados.map(a => {
                     const isExpanded = atletaExpandido === a.id;
+                    const fotoExibir = a.foto && a.foto.trim() !== '' ? a.foto : AVATAR_PADRAO;
+
                     return (
                       <div 
                         key={a.id} 
@@ -338,17 +342,11 @@ export default function App() {
                       >
                         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                           <div className="flex items-center gap-4 w-full sm:w-auto">
-                            {a.foto ? (
-                              <img 
-                                src={a.foto} 
-                                alt={a.nome} 
-                                className="w-16 h-16 rounded-full object-cover border-2 border-red-600 shadow-md flex-shrink-0" 
-                              />
-                            ) : (
-                              <div className="w-16 h-16 rounded-full bg-zinc-800 border-2 border-zinc-700 flex items-center justify-center font-bold text-lg text-white flex-shrink-0">
-                                {a.nome.substring(0, 2).toUpperCase()}
-                              </div>
-                            )}
+                            <img 
+                              src={fotoExibir} 
+                              alt={a.nome} 
+                              className="w-16 h-16 rounded-full object-cover border-2 border-red-600 shadow-md flex-shrink-0" 
+                            />
 
                             <div className="space-y-1">
                               <h3 className="font-extrabold text-lg text-white">
@@ -380,7 +378,7 @@ export default function App() {
 
                         {/* Conteúdo Detalhado Expandível */}
                         {isExpanded && (
-                          <div className="border-t border-red-600/40 mt-4 pt-4 text-xs animate-fadeIn">
+                          <div className="border-t border-red-600/40 mt-4 pt-4 text-xs">
                             <div className="flex flex-col sm:flex-row items-start justify-between gap-6">
                               <div className="space-y-3 flex-1 text-left w-full">
                                 <div>
@@ -407,7 +405,7 @@ export default function App() {
                                   <img src={a.fotoCorpo} alt={`Perfil em pé ${a.nome}`} className="w-full h-full object-cover" />
                                 </div>
                               ) : (
-                                <div className="w-full sm:w-48 h-48 sm:h-64 rounded-xl border border-dashed border-zinc-800 flex flex-col items-center justify-center text-zinc-600 text-center p-3 flex-shrink-0">
+                                <div className="w-full sm:w-48 h-36 rounded-xl border border-dashed border-zinc-800 flex flex-col items-center justify-center text-zinc-600 text-center p-3 flex-shrink-0">
                                   <User size={24} className="opacity-40 mb-1" />
                                   <span className="text-[10px]">Sem foto em pé</span>
                                 </div>
