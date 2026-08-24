@@ -5,6 +5,8 @@ import LoginModal from './components/LoginModal';
 import Footer from './components/Footer';
 import logoImg from './assets/logo.jpg';
 import { User, MapPin, Clock, Calendar, Filter, Layers, AlertCircle, ChevronDown, ChevronUp } from 'lucide-react';
+import { db } from './firebase';
+import { collection, onSnapshot } from 'firebase/firestore';
 
 const AVATAR_PADRAO = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80";
 
@@ -59,66 +61,36 @@ export default function App() {
   const [filtroIdade, setFiltroIdade] = useState('Todas');
   const [atletaExpandido, setAtletaExpandido] = useState(null);
 
-  const [atletas, setAtletas] = useState(() => {
-    const saved = localStorage.getItem('nagashima_atletas');
-    return saved ? JSON.parse(saved) : [
-      {
-        id: 1,
-        nome: 'Pablo',
-        idade: 22,
-        peso: '75kg',
-        graduacao: 'Faixa Preta (1º ao 5º Dan)',
-        caracteristicas: 'Especialista em Harai Goshi e Seoi Nage. Excelente tempo de reação no kumi-kata.',
-        titulos: 'Campeão Estadual 2025, Vice-campeão Brasileiro 2024',
-        foto: AVATAR_PADRAO,
-        fotoCorpo: '',
-        medalhas: { ouro: 5, prata: 2, bronze: 1 }
-      }
-    ];
+  const [atletas, setAtletas] = useState([]);
+  const [eventos, setEventos] = useState([]);
+
+  const [configSede, setConfigSede] = useState({
+    endereco: 'R. Saturno, 102, 59106-220',
+    bairroCidade: 'Igapó - Natal/RN',
+    horarioJudo: 'Segundas, Quartas e Sextas: 19h00 às 20h30',
+    horarioGeral: 'Terças e Quintas (Infantil): 18h00 às 19h00',
+    facebook: '',
+    instagram: '',
+    youtube: ''
   });
 
-  const [eventos, setEventos] = useState(() => {
-    const saved = localStorage.getItem('nagashima_eventos');
-    return saved ? JSON.parse(saved) : [
-      {
-        id: 1,
-        nome: 'Copa Nagashima de Artes Marciais',
-        data: '2026-10-15',
-        local: 'Ginásio Municipal',
-        tipo: 'Campeonato Interno',
-        categorias: 'Infantil, Juvenil e Adulto',
-        graduacoesPermitidas: 'Todas as faixas',
-        descricao: 'Torneio oficial para ranqueamento interno da academia.',
-        observacoes: '',
-        realizado: false
-      }
-    ];
-  });
+  // SINCRONIZAÇÃO EM TEMPO REAL COM O FIREBASE
+  useEffect(() => {
+    const unsubAtletas = onSnapshot(collection(db, "atletas"), (snapshot) => {
+      const listaAtletas = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setAtletas(listaAtletas);
+    });
 
-  const [configSede, setConfigSede] = useState(() => {
-    const saved = localStorage.getItem('nagashima_sede');
-    return saved ? JSON.parse(saved) : {
-      endereco: 'R. Saturno, 102, 59106-220',
-      bairroCidade: 'Igapó - Natal/RN',
-      horarioJudo: 'Segundas, Quartas e Sextas: 19h00 às 20h30',
-      horarioGeral: 'Terças e Quintas (Infantil): 18h00 às 19h00',
-      facebook: '',
-      instagram: '',
-      youtube: ''
+    const unsubEventos = onSnapshot(collection(db, "eventos"), (snapshot) => {
+      const listaEventos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setEventos(listaEventos);
+    });
+
+    return () => {
+      unsubAtletas();
+      unsubEventos();
     };
-  });
-
-  useEffect(() => {
-    localStorage.setItem('nagashima_atletas', JSON.stringify(atletas));
-  }, [atletas]);
-
-  useEffect(() => {
-    localStorage.setItem('nagashima_eventos', JSON.stringify(eventos));
-  }, [eventos]);
-
-  useEffect(() => {
-    localStorage.setItem('nagashima_sede', JSON.stringify(configSede));
-  }, [configSede]);
+  }, []);
 
   const handleOpenLogin = () => {
     if (isAuthenticated) {
@@ -145,11 +117,11 @@ export default function App() {
 
   const faixasDisponiveis = FAIXAS_JUDO.filter(f => {
     const nomeBase = f.nome.split(' ')[1] || f.nome;
-    return atletas.some(a => a.graduacao.toLowerCase().includes(nomeBase.toLowerCase()));
+    return atletas.some(a => a.graduacao?.toLowerCase().includes(nomeBase.toLowerCase()));
   });
 
   const atletasFiltrados = atletas.filter(a => {
-    const atendeFaixa = filtroFaixa === 'Todas' || a.graduacao.toLowerCase().includes(filtroFaixa.toLowerCase());
+    const atendeFaixa = filtroFaixa === 'Todas' || a.graduacao?.toLowerCase().includes(filtroFaixa.toLowerCase());
     const idadeNum = Number(a.idade);
     let atendeIdade = true;
 
@@ -295,7 +267,7 @@ export default function App() {
                     <option value="Todas">Todas ({atletas.length})</option>
                     {faixasDisponiveis.map(f => {
                       const nomeCurto = f.nome.split(' ')[1] || f.nome;
-                      const totalNaFaixa = atletas.filter(a => a.graduacao.toLowerCase().includes(nomeCurto.toLowerCase())).length;
+                      const totalNaFaixa = atletas.filter(a => a.graduacao?.toLowerCase().includes(nomeCurto.toLowerCase())).length;
                       return (
                         <option key={f.nome} value={nomeCurto}>
                           {nomeCurto} ({totalNaFaixa})
@@ -326,7 +298,7 @@ export default function App() {
 
               {atletasFiltrados.length === 0 ? (
                 <div className="p-8 text-center bg-zinc-900 border border-zinc-800 rounded-xl text-zinc-500 text-sm">
-                  Nenhum atleta encontrado para os filtros selecionados.
+                  Nenhum atleta cadastrado no momento.
                 </div>
               ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
@@ -376,7 +348,6 @@ export default function App() {
                           <strong className="text-red-500 font-bold">Conquistas:</strong> {a.titulos || 'Atleta em formação'}
                         </div>
 
-                        {/* Conteúdo Detalhado Expandível */}
                         {isExpanded && (
                           <div className="border-t border-red-600/40 mt-4 pt-4 text-xs">
                             <div className="flex flex-col sm:flex-row items-start justify-between gap-6">
