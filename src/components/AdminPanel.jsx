@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { db } from '../firebase';
-import { collection, addDoc, doc, deleteDoc, updateDoc } from 'firebase/firestore';
-import { User, Calendar, Settings, LogOut, Plus, Trash2, Edit2, Upload, AlertCircle, CheckCircle } from 'lucide-react';
+import { collection, addDoc, doc, deleteDoc, updateDoc, setDoc } from 'firebase/firestore';
+import { User, Calendar, Settings, LogOut, Plus, Trash2, Edit2, MapPin, Clock, Share2 } from 'lucide-react';
 
 export function formatarDataBR(dataISO) {
   if (!dataISO) return '';
@@ -35,6 +35,17 @@ export default function AdminPanel({ onLogout, atletas, eventos, configSede, set
   const [graduacoesEvento, setGraduacoesEvento] = useState('Todas as faixas');
   const [descricaoEvento, setDescricaoEvento] = useState('');
   const [observacoesEvento, setObservacoesEvento] = useState('');
+
+  // Form Sede & Redes
+  const [formSede, setFormSede] = useState(configSede || {
+    endereco: '',
+    bairroCidade: '',
+    horarioJudo: '',
+    horarioGeral: '',
+    facebook: '',
+    instagram: '',
+    youtube: ''
+  });
 
   const handleFileUpload = (e, setFotoFn) => {
     const file = e.target.files[0];
@@ -151,6 +162,17 @@ export default function AdminPanel({ onLogout, atletas, eventos, configSede, set
     }
   };
 
+  const handleSalvarSede = async (e) => {
+    e.preventDefault();
+    try {
+      await setDoc(doc(db, 'configuracoes', 'sede'), formSede);
+      if (setConfigSede) setConfigSede(formSede);
+      alert('Configurações da Sede e Redes Sociais salvas com sucesso!');
+    } catch (err) {
+      alert('Erro ao salvar configurações da Sede.');
+    }
+  };
+
   return (
     <div className="space-y-8">
       {/* HEADER PAINEL */}
@@ -162,7 +184,7 @@ export default function AdminPanel({ onLogout, atletas, eventos, configSede, set
           <p className="text-xs text-zinc-400">Gerenciamento do portal da Associação Nagashima</p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <button
             onClick={() => setActiveTab('atletas')}
             className={`px-4 py-2 rounded-lg text-xs font-extrabold uppercase transition-all ${activeTab === 'atletas' ? 'bg-red-600 text-white shadow-lg shadow-red-600/30' : 'bg-zinc-800 text-zinc-400 hover:text-white'}`}
@@ -174,6 +196,12 @@ export default function AdminPanel({ onLogout, atletas, eventos, configSede, set
             className={`px-4 py-2 rounded-lg text-xs font-extrabold uppercase transition-all ${activeTab === 'eventos' ? 'bg-red-600 text-white shadow-lg shadow-red-600/30' : 'bg-zinc-800 text-zinc-400 hover:text-white'}`}
           >
             Eventos ({eventos.length})
+          </button>
+          <button
+            onClick={() => setActiveTab('sede')}
+            className={`px-4 py-2 rounded-lg text-xs font-extrabold uppercase transition-all ${activeTab === 'sede' ? 'bg-red-600 text-white shadow-lg shadow-red-600/30' : 'bg-zinc-800 text-zinc-400 hover:text-white'}`}
+          >
+            Sede & Redes
           </button>
           <button
             onClick={onLogout}
@@ -383,6 +411,71 @@ export default function AdminPanel({ onLogout, atletas, eventos, configSede, set
             </div>
           </div>
         </div>
+      )}
+
+      {/* ABA SEDE & REDES */}
+      {activeTab === 'sede' && (
+        <form onSubmit={handleSalvarSede} className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 space-y-6 shadow-xl max-w-2xl mx-auto">
+          <h2 className="font-extrabold uppercase text-white text-sm border-b border-zinc-800 pb-3 flex items-center gap-2">
+            <MapPin className="text-red-500" /> Configurações de Sede, Horários e Redes
+          </h2>
+
+          <div className="space-y-4">
+            <h3 className="text-xs font-bold text-red-500 uppercase flex items-center gap-2">
+              <MapPin size={14} /> Endereço da Sede
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="text-xs font-bold text-zinc-400 block mb-1">Rua e Número</label>
+                <input type="text" value={formSede.endereco} onChange={e => setFormSede({...formSede, endereco: e.target.value})} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-2.5 text-xs text-white focus:border-red-600 outline-none" />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-zinc-400 block mb-1">Bairro e Cidade/UF</label>
+                <input type="text" value={formSede.bairroCidade} onChange={e => setFormSede({...formSede, bairroCidade: e.target.value})} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-2.5 text-xs text-white focus:border-red-600 outline-none" />
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-4 pt-4 border-t border-zinc-800">
+            <h3 className="text-xs font-bold text-red-500 uppercase flex items-center gap-2">
+              <Clock size={14} /> Horários de Treino
+            </h3>
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs font-bold text-zinc-400 block mb-1">Horário Principal / Judô</label>
+                <input type="text" value={formSede.horarioJudo} onChange={e => setFormSede({...formSede, horarioJudo: e.target.value})} placeholder="ex: Segundas, Quartas e Sextas: 19h00 às 20h30" className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-2.5 text-xs text-white focus:border-red-600 outline-none" />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-zinc-400 block mb-1">Horário Infantil / Geral</label>
+                <input type="text" value={formSede.horarioGeral} onChange={e => setFormSede({...formSede, horarioGeral: e.target.value})} placeholder="ex: Terças e Quintas (Infantil): 18h00 às 19h00" className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-2.5 text-xs text-white focus:border-red-600 outline-none" />
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-4 pt-4 border-t border-zinc-800">
+            <h3 className="text-xs font-bold text-red-500 uppercase flex items-center gap-2">
+              <Share2 size={14} /> Redes Sociais
+            </h3>
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs font-bold text-zinc-400 block mb-1">Link do Instagram</label>
+                <input type="text" value={formSede.instagram} onChange={e => setFormSede({...formSede, instagram: e.target.value})} placeholder="https://instagram.com/..." className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-2.5 text-xs text-white focus:border-red-600 outline-none" />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-zinc-400 block mb-1">Link do Facebook</label>
+                <input type="text" value={formSede.facebook} onChange={e => setFormSede({...formSede, facebook: e.target.value})} placeholder="https://facebook.com/..." className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-2.5 text-xs text-white focus:border-red-600 outline-none" />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-zinc-400 block mb-1">Link do YouTube</label>
+                <input type="text" value={formSede.youtube} onChange={e => setFormSede({...formSede, youtube: e.target.value})} placeholder="https://youtube.com/..." className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-2.5 text-xs text-white focus:border-red-600 outline-none" />
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" className="w-full bg-red-600 hover:bg-red-700 text-white font-extrabold p-3 rounded-lg text-xs uppercase transition-all shadow-lg shadow-red-600/30">
+            Salvar Configurações da Sede
+          </button>
+        </form>
       )}
     </div>
   );
