@@ -4,7 +4,7 @@ import AdminPanel, { formatarDataBR } from './components/AdminPanel';
 import LoginModal from './components/LoginModal';
 import Footer from './components/Footer';
 import logoImg from './assets/logo.jpg';
-import { User, MapPin, Clock, Calendar, Filter, Layers, AlertCircle, ChevronDown, ChevronUp, Phone, Mail } from 'lucide-react';
+import { User, MapPin, Clock, Calendar, Filter, Layers, AlertCircle, ChevronDown, ChevronUp, Phone, Mail, Search, MessageCircle, Bell } from 'lucide-react';
 import { db } from './firebase';
 import { collection, onSnapshot, doc } from 'firebase/firestore';
 
@@ -57,12 +57,14 @@ export default function App() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   
+  const [buscaNome, setBuscaNome] = useState('');
   const [filtroFaixa, setFiltroFaixa] = useState('Todas');
   const [filtroIdade, setFiltroIdade] = useState('Todas');
   const [atletaExpandido, setAtletaExpandido] = useState(null);
 
   const [atletas, setAtletas] = useState([]);
   const [eventos, setEventos] = useState([]);
+  const [avisos, setAvisos] = useState([]);
 
   const [configSede, setConfigSede] = useState({
     endereco: 'R. Saturno, 102, 59106-220',
@@ -88,6 +90,11 @@ export default function App() {
       setEventos(listaEventos);
     });
 
+    const unsubAvisos = onSnapshot(collection(db, "avisos"), (snapshot) => {
+      const listaAvisos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setAvisos(listaAvisos);
+    });
+
     const unsubSede = onSnapshot(doc(db, "configuracoes", "sede"), (snapshotDoc) => {
       if (snapshotDoc.exists()) {
         setConfigSede(snapshotDoc.data());
@@ -97,6 +104,7 @@ export default function App() {
     return () => {
       unsubAtletas();
       unsubEventos();
+      unsubAvisos();
       unsubSede();
     };
   }, []);
@@ -130,6 +138,7 @@ export default function App() {
   });
 
   const atletasFiltrados = atletas.filter(a => {
+    const atendeNome = buscaNome.trim() === '' || a.nome?.toLowerCase().includes(buscaNome.toLowerCase());
     const atendeFaixa = filtroFaixa === 'Todas' || a.graduacao?.toLowerCase().includes(filtroFaixa.toLowerCase());
     const idadeNum = Number(a.idade);
     let atendeIdade = true;
@@ -139,24 +148,26 @@ export default function App() {
     if (filtroIdade === 'adulto') atendeIdade = idadeNum >= 18 && idadeNum <= 29;
     if (filtroIdade === 'master') atendeIdade = idadeNum >= 30;
 
-    return atendeFaixa && atendeIdade;
+    return atendeNome && atendeFaixa && atendeIdade;
   });
 
+  const numeroWhatsApp = configSede.telefone ? configSede.telefone.replace(/\D/g, '') : '';
+
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 font-sans flex flex-col justify-between">
+    <div className="min-h-screen bg-zinc-950 text-zinc-100 font-sans flex flex-col justify-between relative">
       <div>
         {/* BARRA SUPERIOR DE CONTATOS */}
         <div className="bg-black/80 border-b border-zinc-900 py-2 px-4 text-xs text-zinc-400">
           <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-center sm:justify-end gap-6">
             {configSede.telefone && (
-              <span className="flex items-center gap-1.5 hover:text-white transition-colors">
+              <a href={`https://wa.me/55${numeroWhatsApp}`} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 hover:text-white transition-colors">
                 <Phone size={14} className="text-red-500" /> {configSede.telefone}
-              </span>
+              </a>
             )}
             {configSede.email && (
-              <span className="flex items-center gap-1.5 hover:text-white transition-colors">
+              <a href={`mailto:${configSede.email}`} className="flex items-center gap-1.5 hover:text-white transition-colors">
                 <Mail size={14} className="text-red-500" /> {configSede.email}
-              </span>
+              </a>
             )}
           </div>
         </div>
@@ -178,9 +189,9 @@ export default function App() {
                   </span>
 
                   <div className="space-y-1">
-                   <h1 className="text-2xl sm:text-5xl font-black uppercase text-white tracking-wider" style={{ fontFamily: "'Shojumaru', cursive, serif" }}>
-  Associação Nagashima
-</h1>
+                    <h1 className="text-2xl sm:text-5xl font-black uppercase text-white tracking-wider" style={{ fontFamily: "'Shojumaru', cursive, serif" }}>
+                      Associação Nagashima
+                    </h1>
                     <p className="text-xs sm:text-sm font-semibold tracking-widest text-red-500 uppercase">
                       Artes Marciais, Esporte e Cultura
                     </p>
@@ -217,6 +228,23 @@ export default function App() {
                   />
                 </div>
               </section>
+
+              {/* MURAL DE AVISOS DO DOJO */}
+              {avisos.length > 0 && (
+                <section className="bg-zinc-900 border border-red-600/30 rounded-2xl p-6 shadow-xl space-y-4">
+                  <h2 className="text-sm font-black uppercase text-red-500 tracking-wider flex items-center gap-2">
+                    <Bell size={18} /> Comunicados Importantes do Dojo
+                  </h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {avisos.map(a => (
+                      <div key={a.id} className="bg-zinc-950 border border-zinc-800 p-4 rounded-xl space-y-1">
+                        <h3 className="font-bold text-white text-sm">{a.titulo}</h3>
+                        <p className="text-xs text-zinc-300 leading-relaxed">{a.conteudo}</p>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
 
               <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-xl space-y-2">
@@ -263,6 +291,7 @@ export default function App() {
               setAtletas={setAtletas} 
               eventos={eventos} 
               setEventos={setEventos}
+              avisos={avisos}
               configSede={configSede}
               setConfigSede={setConfigSede}
             />
@@ -278,52 +307,66 @@ export default function App() {
                 <span className="text-xs text-zinc-500">Toque no card para expandir o perfil</span>
               </div>
 
-              <div className="bg-zinc-900/90 border border-zinc-800 rounded-xl p-4 flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center justify-start gap-4 shadow-lg">
-                <div className="flex items-center justify-between sm:justify-start gap-2">
-                  <span className="text-xs font-bold text-zinc-400 uppercase flex items-center gap-1.5">
-                    <Layers size={14} className="text-red-500" /> Faixa:
-                  </span>
-                  
-                  <select 
-                    value={filtroFaixa} 
-                    onChange={e => setFiltroFaixa(e.target.value)}
-                    className="bg-zinc-950 border border-zinc-800 text-white text-xs font-semibold rounded-lg p-2 focus:border-red-600 outline-none w-full sm:w-auto"
-                  >
-                    <option value="Todas">Todas ({atletas.length})</option>
-                    {faixasDisponiveis.map(f => {
-                      const nomeCurto = f.nome.split(' ')[1] || f.nome;
-                      const totalNaFaixa = atletas.filter(a => a.graduacao?.toLowerCase().includes(nomeCurto.toLowerCase())).length;
-                      return (
-                        <option key={f.nome} value={nomeCurto}>
-                          {nomeCurto} ({totalNaFaixa})
-                        </option>
-                      );
-                    })}
-                  </select>
+              {/* FILTROS E PESQUISA POR NOME */}
+              <div className="bg-zinc-900/90 border border-zinc-800 rounded-xl p-4 flex flex-col md:flex-row flex-wrap items-stretch md:items-center justify-between gap-4 shadow-lg">
+                <div className="relative flex-1 min-w-[200px]">
+                  <Search size={16} className="absolute left-3 top-3 text-zinc-500" />
+                  <input
+                    type="text"
+                    placeholder="Pesquisar atleta por nome..."
+                    value={buscaNome}
+                    onChange={e => setBuscaNome(e.target.value)}
+                    className="w-full bg-zinc-950 border border-zinc-800 rounded-lg pl-9 pr-4 py-2 text-xs text-white focus:border-red-600 outline-none"
+                  />
                 </div>
 
-                <div className="flex items-center justify-between sm:justify-start gap-2">
-                  <span className="text-xs font-bold text-zinc-400 uppercase flex items-center gap-1.5">
-                    <Filter size={14} className="text-red-500" /> Categoria:
-                  </span>
-                  
-                  <select 
-                    value={filtroIdade} 
-                    onChange={e => setFiltroIdade(e.target.value)}
-                    className="bg-zinc-950 border border-zinc-800 text-white text-xs font-semibold rounded-lg p-2 focus:border-red-600 outline-none w-full sm:w-auto"
-                  >
-                    <option value="Todas">Todas as Categorias</option>
-                    <option value="infantil">Infantil (até 12 anos)</option>
-                    <option value="juvenil">Juvenil (13 a 17 anos)</option>
-                    <option value="adulto">Adulto (18 a 29 anos)</option>
-                    <option value="master">Master (30+ anos)</option>
-                  </select>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <div className="flex items-center justify-between sm:justify-start gap-2">
+                    <span className="text-xs font-bold text-zinc-400 uppercase flex items-center gap-1.5">
+                      <Layers size={14} className="text-red-500" /> Faixa:
+                    </span>
+                    
+                    <select 
+                      value={filtroFaixa} 
+                      onChange={e => setFiltroFaixa(e.target.value)}
+                      className="bg-zinc-950 border border-zinc-800 text-white text-xs font-semibold rounded-lg p-2 focus:border-red-600 outline-none w-full sm:w-auto"
+                    >
+                      <option value="Todas">Todas ({atletas.length})</option>
+                      {faixasDisponiveis.map(f => {
+                        const nomeCurto = f.nome.split(' ')[1] || f.nome;
+                        const totalNaFaixa = atletas.filter(a => a.graduacao?.toLowerCase().includes(nomeCurto.toLowerCase())).length;
+                        return (
+                          <option key={f.nome} value={nomeCurto}>
+                            {nomeCurto} ({totalNaFaixa})
+                          </option>
+                        );
+                      })}
+                    </select>
+                  </div>
+
+                  <div className="flex items-center justify-between sm:justify-start gap-2">
+                    <span className="text-xs font-bold text-zinc-400 uppercase flex items-center gap-1.5">
+                      <Filter size={14} className="text-red-500" /> Categoria:
+                    </span>
+                    
+                    <select 
+                      value={filtroIdade} 
+                      onChange={e => setFiltroIdade(e.target.value)}
+                      className="bg-zinc-950 border border-zinc-800 text-white text-xs font-semibold rounded-lg p-2 focus:border-red-600 outline-none w-full sm:w-auto"
+                    >
+                      <option value="Todas">Todas as Categorias</option>
+                      <option value="infantil">Infantil (até 12 anos)</option>
+                      <option value="juvenil">Juvenil (13 a 17 anos)</option>
+                      <option value="adulto">Adulto (18 a 29 anos)</option>
+                      <option value="master">Master (30+ anos)</option>
+                    </select>
+                  </div>
                 </div>
               </div>
 
               {atletasFiltrados.length === 0 ? (
                 <div className="p-8 text-center bg-zinc-900 border border-zinc-800 rounded-xl text-zinc-500 text-sm">
-                  Nenhum atleta cadastrado no momento.
+                  Nenhum atleta encontrado para os filtros selecionados.
                 </div>
               ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
@@ -464,6 +507,19 @@ export default function App() {
           )}
         </main>
       </div>
+
+      {/* BOTÃO FLUTUANTE DO WHATSAPP */}
+      {numeroWhatsApp && (
+        <a
+          href={`https://wa.me/55${numeroWhatsApp}?text=Olá,%20gostaria%20de%20mais%20informações%20sobre%20a%20Associação%20Nagashima!`}
+          target="_blank"
+          rel="noreferrer"
+          className="fixed bottom-6 right-6 bg-emerald-600 hover:bg-emerald-500 text-white p-4 rounded-full shadow-2xl flex items-center justify-center transition-all z-50 hover:scale-110"
+          title="Fale Conosco no WhatsApp"
+        >
+          <MessageCircle size={28} />
+        </a>
+      )}
 
       <LoginModal 
         isOpen={isLoginOpen} 
