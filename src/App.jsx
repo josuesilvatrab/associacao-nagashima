@@ -4,7 +4,7 @@ import AdminPanel, { formatarDataBR } from './components/AdminPanel';
 import LoginModal from './components/LoginModal';
 import Footer from './components/Footer';
 import logoImg from './assets/logo.jpg';
-import { User, MapPin, Clock, Calendar, Filter, Layers, AlertCircle, ChevronDown, ChevronUp, Phone, Mail, Search, Bell } from 'lucide-react';
+import { User, MapPin, Clock, Calendar, Filter, Layers, AlertCircle, ChevronDown, ChevronUp, Search, Bell } from 'lucide-react';
 import { db } from './firebase';
 import { collection, onSnapshot, doc } from 'firebase/firestore';
 
@@ -71,8 +71,8 @@ export default function App() {
     bairroCidade: 'Igapó - Natal/RN',
     horarioJudo: 'Segundas, Quartas e Sextas: 19h00 às 20h30',
     horarioGeral: 'Terças e Quintas (Infantil): 18h00 às 19h00',
-    telefone: '(84) 98888-0000',
-    email: 'contato@nagashimadojo.com.br',
+    telefone: '',
+    email: '',
     facebook: '',
     instagram: '',
     youtube: ''
@@ -150,27 +150,9 @@ export default function App() {
     return atendeNome && atendeFaixa && atendeIdade;
   });
 
-  const numeroWhatsApp = configSede.telefone ? configSede.telefone.replace(/\D/g, '') : '';
-
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100 font-sans flex flex-col justify-between">
       <div>
-        {/* BARRA SUPERIOR DE CONTATOS */}
-        <div className="bg-black/80 border-b border-zinc-900 py-2 px-4 text-xs text-zinc-400">
-          <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-center sm:justify-end gap-6">
-            {configSede.telefone && (
-              <a href={`https://wa.me/55${numeroWhatsApp}`} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 hover:text-white transition-colors">
-                <Phone size={14} className="text-red-500" /> {configSede.telefone}
-              </a>
-            )}
-            {configSede.email && (
-              <a href={`mailto:${configSede.email}`} className="flex items-center gap-1.5 hover:text-white transition-colors">
-                <Mail size={14} className="text-red-500" /> {configSede.email}
-              </a>
-            )}
-          </div>
-        </div>
-
         <Navbar 
           activePage={activePage} 
           setActivePage={setActivePage} 
@@ -509,7 +491,7 @@ export default function App() {
         onLoginSuccess={handleLoginSuccess} 
       />
 
-      <Footer />
+      <Footer configSede={configSede} />
     </div>
   );
 }
