@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { db } from '../firebase';
 import { collection, addDoc, doc, deleteDoc, updateDoc, setDoc } from 'firebase/firestore';
-import { User, Calendar, Settings, LogOut, Plus, Trash2, Edit2, MapPin, Clock, Share2, Phone, Mail } from 'lucide-react';
+import { Settings, LogOut, Plus, Trash2, Edit2, MapPin, Clock, Share2, Phone, Mail, Bell } from 'lucide-react';
 
 export function formatarDataBR(dataISO) {
   if (!dataISO) return '';
@@ -9,7 +9,7 @@ export function formatarDataBR(dataISO) {
   return `${dia}/${mes}/${ano}`;
 }
 
-export default function AdminPanel({ onLogout, atletas, eventos, configSede, setConfigSede }) {
+export default function AdminPanel({ onLogout, atletas, eventos, avisos, configSede, setConfigSede }) {
   const [activeTab, setActiveTab] = useState('atletas');
   const [editandoId, setEditandoId] = useState(null);
 
@@ -36,7 +36,11 @@ export default function AdminPanel({ onLogout, atletas, eventos, configSede, set
   const [descricaoEvento, setDescricaoEvento] = useState('');
   const [observacoesEvento, setObservacoesEvento] = useState('');
 
-  // Form Sede & Redes & Contatos
+  // Form Aviso
+  const [tituloAviso, setTituloAviso] = useState('');
+  const [conteudoAviso, setConteudoAviso] = useState('');
+
+  // Form Sede
   const [formSede, setFormSede] = useState(configSede || {
     endereco: '',
     bairroCidade: '',
@@ -87,7 +91,6 @@ export default function AdminPanel({ onLogout, atletas, eventos, configSede, set
       } else {
         await addDoc(collection(db, 'atletas'), dadosAtleta);
       }
-
       limparFormAtleta();
     } catch (err) {
       alert('Erro ao salvar atleta no banco de dados.');
@@ -164,14 +167,37 @@ export default function AdminPanel({ onLogout, atletas, eventos, configSede, set
     }
   };
 
+  const handleSalvarAviso = async (e) => {
+    e.preventDefault();
+    if (!tituloAviso || !conteudoAviso) return alert('Preencha o título e o conteúdo do aviso.');
+
+    try {
+      await addDoc(collection(db, 'avisos'), {
+        titulo: tituloAviso,
+        conteudo: conteudoAviso,
+        dataCriacao: new Date().toISOString()
+      });
+      setTituloAviso('');
+      setConteudoAviso('');
+    } catch (err) {
+      alert('Erro ao publicar aviso.');
+    }
+  };
+
+  const handleExcluirAviso = async (id) => {
+    if (confirm('Deseja excluir este aviso?')) {
+      await deleteDoc(doc(db, 'avisos', id));
+    }
+  };
+
   const handleSalvarSede = async (e) => {
     e.preventDefault();
     try {
       await setDoc(doc(db, 'configuracoes', 'sede'), formSede);
       if (setConfigSede) setConfigSede(formSede);
-      alert('Configurações de Sede, Contatos e Redes Sociais salvas no banco de dados!');
+      alert('Configurações de Sede, Contatos e Redes Sociais salvas com sucesso!');
     } catch (err) {
-      alert('Erro ao salvar configurações da Sede.');
+      alert('Erro ao salvar configurações.');
     }
   };
 
@@ -198,6 +224,12 @@ export default function AdminPanel({ onLogout, atletas, eventos, configSede, set
             className={`px-4 py-2 rounded-lg text-xs font-extrabold uppercase transition-all ${activeTab === 'eventos' ? 'bg-red-600 text-white shadow-lg shadow-red-600/30' : 'bg-zinc-800 text-zinc-400 hover:text-white'}`}
           >
             Eventos ({eventos.length})
+          </button>
+          <button
+            onClick={() => setActiveTab('avisos')}
+            className={`px-4 py-2 rounded-lg text-xs font-extrabold uppercase transition-all ${activeTab === 'avisos' ? 'bg-red-600 text-white shadow-lg shadow-red-600/30' : 'bg-zinc-800 text-zinc-400 hover:text-white'}`}
+          >
+            Mural de Avisos ({avisos?.length || 0})
           </button>
           <button
             onClick={() => setActiveTab('sede')}
@@ -304,7 +336,6 @@ export default function AdminPanel({ onLogout, atletas, eventos, configSede, set
             </button>
           </form>
 
-          {/* LISTA DE ATLETAS */}
           <div className="lg:col-span-2 space-y-4">
             <h2 className="font-extrabold uppercase text-white text-sm">Atletas Cadastrados</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -412,6 +443,51 @@ export default function AdminPanel({ onLogout, atletas, eventos, configSede, set
         </div>
       )}
 
+      {/* ABA MURAL DE AVISOS */}
+      {activeTab === 'avisos' && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <form onSubmit={handleSalvarAviso} className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 space-y-4 shadow-xl h-fit">
+            <h2 className="font-extrabold uppercase text-white text-sm flex items-center gap-2 border-b border-zinc-800 pb-3">
+              <Bell size={16} className="text-red-500" /> Publicar Novo Aviso no Dojo
+            </h2>
+
+            <div>
+              <label className="text-xs font-bold text-zinc-400 block mb-1">Título do Aviso</label>
+              <input type="text" value={tituloAviso} onChange={e => setTituloAviso(e.target.value)} placeholder="ex: Exame de Faixa em Novembro" className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-2.5 text-xs text-white focus:border-red-600 outline-none" required />
+            </div>
+
+            <div>
+              <label className="text-xs font-bold text-zinc-400 block mb-1">Conteúdo do Recado</label>
+              <textarea value={conteudoAviso} onChange={e => setConteudoAviso(e.target.value)} rows="4" placeholder="Escreva os detalhes para os alunos e pais..." className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-2.5 text-xs text-white focus:border-red-600 outline-none" required />
+            </div>
+
+            <button type="submit" className="w-full bg-red-600 hover:bg-red-700 text-white font-extrabold p-3 rounded-lg text-xs uppercase transition-all shadow-lg shadow-red-600/30">
+              Publicar Aviso
+            </button>
+          </form>
+
+          <div className="lg:col-span-2 space-y-4">
+            <h2 className="font-extrabold uppercase text-white text-sm">Avisos Ativos na Tela Inicial</h2>
+            <div className="space-y-3">
+              {avisos?.map(a => (
+                <div key={a.id} className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 flex items-start justify-between gap-4 shadow-lg">
+                  <div>
+                    <h3 className="font-extrabold text-white text-sm flex items-center gap-2">
+                      <Bell size={14} className="text-red-500" /> {a.titulo}
+                    </h3>
+                    <p className="text-xs text-zinc-300 mt-2 leading-relaxed">{a.conteudo}</p>
+                  </div>
+
+                  <button onClick={() => handleExcluirAviso(a.id)} className="text-red-500 hover:text-red-400 p-2 rounded-lg hover:bg-zinc-800">
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ABA SEDE & REDES & CONTATOS */}
       {activeTab === 'sede' && (
         <form onSubmit={handleSalvarSede} className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 space-y-6 shadow-xl max-w-2xl mx-auto">
@@ -419,7 +495,6 @@ export default function AdminPanel({ onLogout, atletas, eventos, configSede, set
             <MapPin className="text-red-500" /> Configurações de Sede, Contatos e Redes
           </h2>
 
-          {/* CONTATOS */}
           <div className="space-y-4">
             <h3 className="text-xs font-bold text-red-500 uppercase flex items-center gap-2">
               <Phone size={14} /> Contatos Principais (Topo e Rodapé)
@@ -436,7 +511,6 @@ export default function AdminPanel({ onLogout, atletas, eventos, configSede, set
             </div>
           </div>
 
-          {/* ENDEREÇO */}
           <div className="space-y-4 pt-4 border-t border-zinc-800">
             <h3 className="text-xs font-bold text-red-500 uppercase flex items-center gap-2">
               <MapPin size={14} /> Endereço da Sede
@@ -453,7 +527,6 @@ export default function AdminPanel({ onLogout, atletas, eventos, configSede, set
             </div>
           </div>
 
-          {/* HORÁRIOS */}
           <div className="space-y-4 pt-4 border-t border-zinc-800">
             <h3 className="text-xs font-bold text-red-500 uppercase flex items-center gap-2">
               <Clock size={14} /> Horários de Treino
@@ -470,7 +543,6 @@ export default function AdminPanel({ onLogout, atletas, eventos, configSede, set
             </div>
           </div>
 
-          {/* REDES SOCIAIS */}
           <div className="space-y-4 pt-4 border-t border-zinc-800">
             <h3 className="text-xs font-bold text-red-500 uppercase flex items-center gap-2">
               <Share2 size={14} /> Redes Sociais
