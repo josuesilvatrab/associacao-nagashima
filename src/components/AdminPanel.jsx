@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { db } from '../firebase';
 import { collection, addDoc, doc, deleteDoc, updateDoc, setDoc } from 'firebase/firestore';
-import { User, Calendar, Settings, LogOut, Plus, Trash2, Edit2, MapPin, Clock, Share2 } from 'lucide-react';
+import { User, Calendar, Settings, LogOut, Plus, Trash2, Edit2, MapPin, Clock, Share2, Phone, Mail } from 'lucide-react';
 
 export function formatarDataBR(dataISO) {
   if (!dataISO) return '';
@@ -36,12 +36,14 @@ export default function AdminPanel({ onLogout, atletas, eventos, configSede, set
   const [descricaoEvento, setDescricaoEvento] = useState('');
   const [observacoesEvento, setObservacoesEvento] = useState('');
 
-  // Form Sede & Redes
+  // Form Sede & Redes & Contatos
   const [formSede, setFormSede] = useState(configSede || {
     endereco: '',
     bairroCidade: '',
     horarioJudo: '',
     horarioGeral: '',
+    telefone: '',
+    email: '',
     facebook: '',
     instagram: '',
     youtube: ''
@@ -167,7 +169,7 @@ export default function AdminPanel({ onLogout, atletas, eventos, configSede, set
     try {
       await setDoc(doc(db, 'configuracoes', 'sede'), formSede);
       if (setConfigSede) setConfigSede(formSede);
-      alert('Configurações da Sede e Redes Sociais salvas com sucesso!');
+      alert('Configurações de Sede, Contatos e Redes Sociais salvas no banco de dados!');
     } catch (err) {
       alert('Erro ao salvar configurações da Sede.');
     }
@@ -262,19 +264,16 @@ export default function AdminPanel({ onLogout, atletas, eventos, configSede, set
               </select>
             </div>
 
-            {/* FOTO PERFIL */}
             <div>
               <label className="text-xs font-bold text-zinc-400 block mb-1">Foto de Rosto (Perfil)</label>
               <input type="file" accept="image/*" onChange={e => handleFileUpload(e, setFoto)} className="w-full text-xs text-zinc-400 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-zinc-800 file:text-white hover:file:bg-zinc-700 cursor-pointer" />
             </div>
 
-            {/* FOTO CORPO */}
             <div>
               <label className="text-xs font-bold text-zinc-400 block mb-1">Foto em Pé (Corpo Inteiro)</label>
               <input type="file" accept="image/*" onChange={e => handleFileUpload(e, setFotoCorpo)} className="w-full text-xs text-zinc-400 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-zinc-800 file:text-white hover:file:bg-zinc-700 cursor-pointer" />
             </div>
 
-            {/* MEDALHAS */}
             <div className="grid grid-cols-3 gap-2 pt-2 border-t border-zinc-800">
               <div>
                 <label className="text-[10px] font-bold text-yellow-500 block mb-1">🥇 Ouro</label>
@@ -413,14 +412,32 @@ export default function AdminPanel({ onLogout, atletas, eventos, configSede, set
         </div>
       )}
 
-      {/* ABA SEDE & REDES */}
+      {/* ABA SEDE & REDES & CONTATOS */}
       {activeTab === 'sede' && (
         <form onSubmit={handleSalvarSede} className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 space-y-6 shadow-xl max-w-2xl mx-auto">
           <h2 className="font-extrabold uppercase text-white text-sm border-b border-zinc-800 pb-3 flex items-center gap-2">
-            <MapPin className="text-red-500" /> Configurações de Sede, Horários e Redes
+            <MapPin className="text-red-500" /> Configurações de Sede, Contatos e Redes
           </h2>
 
+          {/* CONTATOS */}
           <div className="space-y-4">
+            <h3 className="text-xs font-bold text-red-500 uppercase flex items-center gap-2">
+              <Phone size={14} /> Contatos Principais (Topo e Rodapé)
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="text-xs font-bold text-zinc-400 block mb-1">Telefone / WhatsApp</label>
+                <input type="text" value={formSede.telefone} onChange={e => setFormSede({...formSede, telefone: e.target.value})} placeholder="ex: (84) 98888-0000" className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-2.5 text-xs text-white focus:border-red-600 outline-none" />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-zinc-400 block mb-1">E-mail Oficial</label>
+                <input type="email" value={formSede.email} onChange={e => setFormSede({...formSede, email: e.target.value})} placeholder="ex: contato@nagashimadojo.com.br" className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-2.5 text-xs text-white focus:border-red-600 outline-none" />
+              </div>
+            </div>
+          </div>
+
+          {/* ENDEREÇO */}
+          <div className="space-y-4 pt-4 border-t border-zinc-800">
             <h3 className="text-xs font-bold text-red-500 uppercase flex items-center gap-2">
               <MapPin size={14} /> Endereço da Sede
             </h3>
@@ -436,6 +453,7 @@ export default function AdminPanel({ onLogout, atletas, eventos, configSede, set
             </div>
           </div>
 
+          {/* HORÁRIOS */}
           <div className="space-y-4 pt-4 border-t border-zinc-800">
             <h3 className="text-xs font-bold text-red-500 uppercase flex items-center gap-2">
               <Clock size={14} /> Horários de Treino
@@ -452,6 +470,7 @@ export default function AdminPanel({ onLogout, atletas, eventos, configSede, set
             </div>
           </div>
 
+          {/* REDES SOCIAIS */}
           <div className="space-y-4 pt-4 border-t border-zinc-800">
             <h3 className="text-xs font-bold text-red-500 uppercase flex items-center gap-2">
               <Share2 size={14} /> Redes Sociais
@@ -473,7 +492,7 @@ export default function AdminPanel({ onLogout, atletas, eventos, configSede, set
           </div>
 
           <button type="submit" className="w-full bg-red-600 hover:bg-red-700 text-white font-extrabold p-3 rounded-lg text-xs uppercase transition-all shadow-lg shadow-red-600/30">
-            Salvar Configurações da Sede
+            Salvar Configurações no Banco
           </button>
         </form>
       )}
