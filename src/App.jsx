@@ -508,17 +508,16 @@ export default function App() {
         </main>
       </div>
 
-      {/* BOTÃO FLUTUANTE DO WHATSAPP */}
-      {numeroWhatsApp && (
-        <a
-          href={`https://wa.me/55${numeroWhatsApp}?text=Olá,%20gostaria%20de%20mais%20informações%20sobre%20a%20Associação%20Nagashima!`}
-          target="_blank"
-          rel="noreferrer"
-          className="fixed bottom-6 right-6 bg-emerald-600 hover:bg-emerald-500 text-white p-4 rounded-full shadow-2xl flex items-center justify-center transition-all z-50 hover:scale-110"
-          title="Fale Conosco no WhatsApp"
-        >
-          <MessageCircle size={28} />
-        </a>
+      {/* BOTÃO FLUTUANTE DO WHATSAPP MINIMALISTA */}
+<a
+  href={`https://wa.me/55${numeroWhatsApp}?text=Olá,%20gostaria%20de%20mais%20informações%20sobre%20a%20Associação%20Nagashima!`}
+  target="_blank"
+  rel="noreferrer"
+  className="fixed bottom-6 right-6 bg-zinc-900/90 hover:bg-[#25D366] text-zinc-400 hover:text-white p-3.5 rounded-full shadow-2xl border border-zinc-800 hover:border-[#25D366] flex items-center justify-center transition-all duration-300 z-50 hover:scale-110 hover:shadow-[#25D366]/20 backdrop-blur-md group"
+  title="Fale Conosco no WhatsApp"
+>
+  <MessageCircle size={22} className="transition-transform group-hover:scale-110" />
+</a>
       )}
 
       <LoginModal 
