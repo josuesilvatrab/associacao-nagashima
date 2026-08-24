@@ -4,7 +4,7 @@ import AdminPanel, { formatarDataBR } from './components/AdminPanel';
 import LoginModal from './components/LoginModal';
 import Footer from './components/Footer';
 import logoImg from './assets/logo.jpg';
-import { User, MapPin, Clock, Calendar, Filter, Layers, AlertCircle, ChevronDown, ChevronUp, Phone, Mail, Search, MessageCircle, Bell } from 'lucide-react';
+import { User, MapPin, Clock, Calendar, Filter, Layers, AlertCircle, ChevronDown, ChevronUp, Phone, Mail, Search, Bell } from 'lucide-react';
 import { db } from './firebase';
 import { collection, onSnapshot, doc } from 'firebase/firestore';
 
@@ -78,7 +78,6 @@ export default function App() {
     youtube: ''
   });
 
-  // SINCRONIZAÇÃO EM TEMPO REAL COM O FIREBASE
   useEffect(() => {
     const unsubAtletas = onSnapshot(collection(db, "atletas"), (snapshot) => {
       const listaAtletas = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -154,7 +153,7 @@ export default function App() {
   const numeroWhatsApp = configSede.telefone ? configSede.telefone.replace(/\D/g, '') : '';
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 font-sans flex flex-col justify-between relative">
+    <div className="min-h-screen bg-zinc-950 text-zinc-100 font-sans flex flex-col justify-between">
       <div>
         {/* BARRA SUPERIOR DE CONTATOS */}
         <div className="bg-black/80 border-b border-zinc-900 py-2 px-4 text-xs text-zinc-400">
@@ -229,7 +228,6 @@ export default function App() {
                 </div>
               </section>
 
-              {/* MURAL DE AVISOS DO DOJO */}
               {avisos.length > 0 && (
                 <section className="bg-zinc-900 border border-red-600/30 rounded-2xl p-6 shadow-xl space-y-4">
                   <h2 className="text-sm font-black uppercase text-red-500 tracking-wider flex items-center gap-2">
@@ -297,7 +295,6 @@ export default function App() {
             />
           )}
 
-          {/* ABA PÚBLICA DE ATLETAS */}
           {activePage === 'atletas' && (
             <div className="space-y-6">
               <div className="flex items-center justify-between flex-wrap gap-4">
@@ -307,7 +304,6 @@ export default function App() {
                 <span className="text-xs text-zinc-500">Toque no card para expandir o perfil</span>
               </div>
 
-              {/* FILTROS E PESQUISA POR NOME */}
               <div className="bg-zinc-900/90 border border-zinc-800 rounded-xl p-4 flex flex-col md:flex-row flex-wrap items-stretch md:items-center justify-between gap-4 shadow-lg">
                 <div className="relative flex-1 min-w-[200px]">
                   <Search size={16} className="absolute left-3 top-3 text-zinc-500" />
@@ -460,7 +456,6 @@ export default function App() {
             </div>
           )}
 
-          {/* ABA PÚBLICA DE EVENTOS */}
           {activePage === 'eventos' && (
             <div className="space-y-6">
               <h2 className="text-xl sm:text-2xl font-black uppercase text-white tracking-wider flex items-center gap-2">
@@ -507,18 +502,6 @@ export default function App() {
           )}
         </main>
       </div>
-
-      {/* BOTÃO FLUTUANTE DO WHATSAPP MINIMALISTA */}
-<a
-  href={`https://wa.me/55${numeroWhatsApp}?text=Olá,%20gostaria%20de%20mais%20informações%20sobre%20a%20Associação%20Nagashima!`}
-  target="_blank"
-  rel="noreferrer"
-  className="fixed bottom-6 right-6 bg-zinc-900/90 hover:bg-[#25D366] text-zinc-400 hover:text-white p-3.5 rounded-full shadow-2xl border border-zinc-800 hover:border-[#25D366] flex items-center justify-center transition-all duration-300 z-50 hover:scale-110 hover:shadow-[#25D366]/20 backdrop-blur-md group"
-  title="Fale Conosco no WhatsApp"
->
-  <MessageCircle size={22} className="transition-transform group-hover:scale-110" />
-</a>
-      )}
 
       <LoginModal 
         isOpen={isLoginOpen} 
