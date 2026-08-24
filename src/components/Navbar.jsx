@@ -8,7 +8,7 @@ export default function Navbar({ activePage, setActivePage, onOpenLogin, configS
     <header className="bg-zinc-950/90 backdrop-blur-md border-b border-zinc-900 sticky top-0 z-40">
       <div className="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-4">
         
-        {/* REDES SOCIAIS MINIMALISTAS COM HOVER COLORIDO */}
+        {/* REDES SOCIAIS E WHATSAPP NO MESMO LUGAR */}
         <div className="flex items-center gap-3 text-xs text-zinc-400">
           <span className="font-bold uppercase tracking-wider text-[11px] text-zinc-500 hidden sm:inline">
             Acesse nossas redes:
@@ -62,21 +62,20 @@ export default function Navbar({ activePage, setActivePage, onOpenLogin, configS
               </span>
             )}
 
-            {numeroWhatsApp && (
-              <a
-                href={`https://wa.me/55${numeroWhatsApp}`}
-                target="_blank"
-                rel="noreferrer"
-                className="p-1.5 rounded-lg text-zinc-400 hover:text-[#25D366] hover:bg-zinc-900 transition-all duration-300 hover:scale-110"
-                title="WhatsApp"
-              >
-                <MessageCircle size={17} />
-              </a>
-            )}
+            {/* ÍCONE DO WHATSAPP JUNTO AOS OUTROS */}
+            <a
+              href={`https://wa.me/55${numeroWhatsApp || '84988880000'}?text=Olá,%20gostaria%20de%20mais%20informações%20sobre%20a%20Associação%20Nagashima!`}
+              target="_blank"
+              rel="noreferrer"
+              className="p-1.5 rounded-lg text-zinc-400 hover:text-[#25D366] hover:bg-zinc-900 transition-all duration-300 hover:scale-110"
+              title="WhatsApp"
+            >
+              <MessageCircle size={17} />
+            </a>
           </div>
         </div>
 
-        {/* NAVEGAÇÃO PRINCIPAL */}
+        {/* MENU DE NAVEGAÇÃO */}
         <nav className="flex items-center gap-2">
           <button
             onClick={() => setActivePage('home')}
