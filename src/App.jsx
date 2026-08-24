@@ -178,9 +178,9 @@ export default function App() {
                   </span>
 
                   <div className="space-y-1">
-                    <h1 className="text-2xl sm:text-5xl font-black uppercase text-white tracking-wider">
-                      Associação Nagashima
-                    </h1>
+                   <h1 className="text-2xl sm:text-5xl font-black uppercase text-white tracking-wider" style={{ fontFamily: "'Shojumaru', cursive, serif" }}>
+  Associação Nagashima
+</h1>
                     <p className="text-xs sm:text-sm font-semibold tracking-widest text-red-500 uppercase">
                       Artes Marciais, Esporte e Cultura
                     </p>
