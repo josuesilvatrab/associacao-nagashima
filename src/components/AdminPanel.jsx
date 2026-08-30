@@ -35,6 +35,8 @@ export default function AdminPanel({ onLogout, atletas, eventos, avisos, configS
   const [graduacoesEvento, setGraduacoesEvento] = useState('Todas as faixas');
   const [descricaoEvento, setDescricaoEvento] = useState('');
   const [observacoesEvento, setObservacoesEvento] = useState('');
+  const [participaremosEvento, setParticiparemosEvento] = useState(true);
+  const [editandoEventoId, setEditandoEventoId] = useState(null);
 
   // Form Aviso
   const [tituloAviso, setTituloAviso] = useState('');
@@ -137,28 +139,53 @@ export default function AdminPanel({ onLogout, atletas, eventos, avisos, configS
     e.preventDefault();
     if (!nomeEvento || !dataEvento) return alert('Preencha o nome e a data do evento.');
 
-    try {
-      await addDoc(collection(db, 'eventos'), {
-        nome: nomeEvento,
-        data: dataEvento,
-        local: localEvento,
-        tipo: tipoEvento,
-        categorias: categoriasEvento,
-        graduacoesPermitidas: graduacoesEvento,
-        descricao: descricaoEvento,
-        observacoes: observacoesEvento,
-        realizado: false
-      });
+    const dadosEvento = {
+      nome: nomeEvento,
+      data: dataEvento,
+      local: localEvento,
+      tipo: tipoEvento,
+      categorias: categoriasEvento,
+      graduacoesPermitidas: graduacoesEvento,
+      descricao: descricaoEvento,
+      observacoes: observacoesEvento,
+      participaremos: participaremosEvento
+    };
 
-      setNomeEvento('');
-      setDataEvento('');
-      setLocalEvento('');
-      setCategoriasEvento('');
-      setDescricaoEvento('');
-      setObservacoesEvento('');
+    try {
+      if (editandoEventoId) {
+        await updateDoc(doc(db, 'eventos', editandoEventoId), dadosEvento);
+      } else {
+        await addDoc(collection(db, 'eventos'), { ...dadosEvento, realizado: false });
+      }
+      limparFormEvento();
     } catch (err) {
       alert('Erro ao salvar evento.');
     }
+  };
+
+  const handleEditarEvento = (ev) => {
+    setEditandoEventoId(ev.id);
+    setNomeEvento(ev.nome || '');
+    setDataEvento(ev.data || '');
+    setLocalEvento(ev.local || '');
+    setTipoEvento(ev.tipo || 'Campeonato Interno');
+    setCategoriasEvento(ev.categorias || '');
+    setGraduacoesEvento(ev.graduacoesPermitidas || 'Todas as faixas');
+    setDescricaoEvento(ev.descricao || '');
+    setObservacoesEvento(ev.observacoes || '');
+    setParticiparemosEvento(ev.participaremos !== undefined ? ev.participaremos : true);
+  };
+
+  const limparFormEvento = () => {
+    setEditandoEventoId(null);
+    setNomeEvento('');
+    setDataEvento('');
+    setLocalEvento('');
+    setCategoriasEvento('');
+    setGraduacoesEvento('Todas as faixas');
+    setDescricaoEvento('');
+    setObservacoesEvento('');
+    setParticiparemosEvento(true);
   };
 
   const handleExcluirEvento = async (id) => {
@@ -322,7 +349,7 @@ export default function AdminPanel({ onLogout, atletas, eventos, avisos, configS
             </div>
 
             <div>
-              <label className="text-xs font-bold text-zinc-400 block mb-1">Características & Estilo de Luta</label>
+              <label className="text-xs font-bold text-zinc-400 block mb-1">Estilo de Luta e Tokui (Golpe Favorito)</label>
               <textarea value={caracteristicas} onChange={e => setCaracteristicas(e.target.value)} rows="2" className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-2.5 text-xs text-white focus:border-red-600 outline-none" />
             </div>
 
@@ -384,9 +411,45 @@ export default function AdminPanel({ onLogout, atletas, eventos, avisos, configS
       {activeTab === 'eventos' && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <form onSubmit={handleSalvarEvento} className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 space-y-4 shadow-xl h-fit">
-            <h2 className="font-extrabold uppercase text-white text-sm flex items-center gap-2 border-b border-zinc-800 pb-3">
-              <Plus size={16} className="text-red-500" /> Cadastrar Novo Evento
-            </h2>
+            <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
+              <h2 className="font-extrabold uppercase text-white text-sm flex items-center gap-2">
+                <Plus size={16} className="text-red-500" />
+                {editandoEventoId ? 'Editar Evento' : 'Cadastrar Novo Evento'}
+              </h2>
+              {editandoEventoId && (
+                <button type="button" onClick={limparFormEvento} className="text-[10px] text-zinc-400 hover:text-white underline">
+                  Cancelar Edição
+                </button>
+              )}
+            </div>
+
+            <div>
+              <label className="text-xs font-bold text-zinc-400 block mb-1">Iremos Participar?</label>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setParticiparemosEvento(true)}
+                  className={`p-2.5 rounded-lg text-xs font-extrabold uppercase transition-all border ${
+                    participaremosEvento
+                      ? 'bg-emerald-600 border-emerald-500 text-white shadow-md shadow-emerald-600/30'
+                      : 'bg-zinc-950 border-zinc-800 text-zinc-500 hover:text-white'
+                  }`}
+                >
+                  ✅ Iremos Participar
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setParticiparemosEvento(false)}
+                  className={`p-2.5 rounded-lg text-xs font-extrabold uppercase transition-all border ${
+                    !participaremosEvento
+                      ? 'bg-red-600 border-red-500 text-white shadow-md shadow-red-600/30'
+                      : 'bg-zinc-950 border-zinc-800 text-zinc-500 hover:text-white'
+                  }`}
+                >
+                  ❌ Não Participaremos
+                </button>
+              </div>
+            </div>
 
             <div>
               <label className="text-xs font-bold text-zinc-400 block mb-1">Nome do Evento</label>
@@ -419,7 +482,7 @@ export default function AdminPanel({ onLogout, atletas, eventos, avisos, configS
             </div>
 
             <button type="submit" className="w-full bg-red-600 hover:bg-red-700 text-white font-extrabold p-3 rounded-lg text-xs uppercase transition-all shadow-lg shadow-red-600/30">
-              Salvar Evento
+              {editandoEventoId ? 'Atualizar Evento' : 'Salvar Evento'}
             </button>
           </form>
 
@@ -429,13 +492,29 @@ export default function AdminPanel({ onLogout, atletas, eventos, avisos, configS
               {eventos.map(e => (
                 <div key={e.id} className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 flex items-center justify-between gap-4 shadow-lg">
                   <div>
-                    <h3 className="font-extrabold text-white text-sm">{e.nome}</h3>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h3 className="font-extrabold text-white text-sm">{e.nome}</h3>
+                      {e.participaremos !== false ? (
+                        <span className="bg-emerald-950/90 text-emerald-400 border border-emerald-800/80 text-[9px] font-black uppercase px-2 py-0.5 rounded-full">
+                          ✅ Iremos Participar
+                        </span>
+                      ) : (
+                        <span className="bg-red-950/90 text-red-400 border border-red-800/80 text-[9px] font-black uppercase px-2 py-0.5 rounded-full">
+                          ❌ Não Participaremos
+                        </span>
+                      )}
+                    </div>
                     <p className="text-xs text-zinc-400 mt-0.5">📅 {formatarDataBR(e.data)} • 📍 {e.local}</p>
                   </div>
 
-                  <button onClick={() => handleExcluirEvento(e.id)} className="text-red-500 hover:text-red-400 p-2 rounded-lg hover:bg-zinc-800">
-                    <Trash2 size={16} />
-                  </button>
+                  <div className="flex items-center gap-1 flex-shrink-0">
+                    <button onClick={() => handleEditarEvento(e)} className="text-zinc-400 hover:text-white p-2 rounded-lg hover:bg-zinc-800">
+                      <Edit2 size={16} />
+                    </button>
+                    <button onClick={() => handleExcluirEvento(e.id)} className="text-red-500 hover:text-red-400 p-2 rounded-lg hover:bg-zinc-800">
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
