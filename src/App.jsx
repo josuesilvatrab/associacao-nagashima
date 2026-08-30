@@ -400,7 +400,7 @@ export default function App() {
                               <div className="space-y-3 flex-1 text-left w-full">
                                 <div>
                                   <strong className="text-red-500 uppercase font-bold tracking-wider block mb-1">
-                                    🎯 Estilo de Luta & Características:
+                                    🎯 Estilo de Luta e Tokui (Golpe Favorito):
                                   </strong>
                                   <p className="text-zinc-300 leading-relaxed text-xs">
                                     {a.caracteristicas || 'Nenhuma observação técnica cadastrada.'}
@@ -460,6 +460,16 @@ export default function App() {
                         ) : (
                           <span className="bg-emerald-950/90 text-emerald-400 border border-emerald-800/80 text-[10px] sm:text-[11px] font-black uppercase px-3 py-1 rounded-full shadow-sm">
                             📅 {formatarDataBR(e.data)}
+                          </span>
+                        )}
+
+                        {e.participaremos !== false ? (
+                          <span className="bg-emerald-950/90 text-emerald-400 border border-emerald-800/80 text-[9px] sm:text-[10px] font-black uppercase px-3 py-1 rounded-full shadow-sm">
+                            ✅ Iremos Participar
+                          </span>
+                        ) : (
+                          <span className="bg-red-950/90 text-red-400 border border-red-800/80 text-[9px] sm:text-[10px] font-black uppercase px-3 py-1 rounded-full shadow-sm">
+                            ❌ Não Participaremos
                           </span>
                         )}
                       </div>
