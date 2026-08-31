@@ -3,7 +3,11 @@ import { User, Calendar, Home, Lock, Facebook, Instagram, Youtube, MessageCircle
 
 export default function Navbar({ activePage, setActivePage, onOpenLogin, configSede }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const numeroWhatsApp = configSede?.telefone ? configSede.telefone.replace(/\D/g, '') : '';
+
+  // Tratamento do número do WhatsApp
+  const apenasNumeros = configSede?.telefone ? configSede.telefone.replace(/\D/g, '') : '';
+  const numeroValido = apenasNumeros.length >= 10 ? apenasNumeros : '84988880000';
+  const urlWhatsapp = `https://api.whatsapp.com/send?phone=55${numeroValido}&text=Olá,%20gostaria%20de%20mais%20informações!`;
 
   const handleNavClick = (page) => {
     setActivePage(page);
@@ -14,7 +18,7 @@ export default function Navbar({ activePage, setActivePage, onOpenLogin, configS
     <header className="bg-zinc-950/95 backdrop-blur-md border-b border-zinc-900 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
         
-        {/* REDES SOCIAIS E WHATSAPP (SEMPRE VISÍVEIS) */}
+        {/* REDES SOCIAIS E WHATSAPP */}
         <div className="flex items-center gap-2 text-xs text-zinc-400">
           <span className="font-bold uppercase tracking-wider text-[11px] text-zinc-500 hidden md:inline">
             Redes:
@@ -33,7 +37,7 @@ export default function Navbar({ activePage, setActivePage, onOpenLogin, configS
                 <Facebook size={18} />
               </a>
             ) : (
-              <span className="p-1.5 text-zinc-600 cursor-not-allowed opacity-50" title="Facebook não cadastrado">
+              <span className="p-1.5 text-zinc-600 opacity-50 cursor-not-allowed" title="Facebook não cadastrado">
                 <Facebook size={18} />
               </span>
             )}
@@ -50,7 +54,7 @@ export default function Navbar({ activePage, setActivePage, onOpenLogin, configS
                 <Instagram size={18} />
               </a>
             ) : (
-              <span className="p-1.5 text-zinc-600 cursor-not-allowed opacity-50" title="Instagram não cadastrado">
+              <span className="p-1.5 text-zinc-600 opacity-50 cursor-not-allowed" title="Instagram não cadastrado">
                 <Instagram size={18} />
               </span>
             )}
@@ -67,14 +71,14 @@ export default function Navbar({ activePage, setActivePage, onOpenLogin, configS
                 <Youtube size={18} />
               </a>
             ) : (
-              <span className="p-1.5 text-zinc-600 cursor-not-allowed opacity-50" title="YouTube não cadastrado">
+              <span className="p-1.5 text-zinc-600 opacity-50 cursor-not-allowed" title="YouTube não cadastrado">
                 <Youtube size={18} />
               </span>
             )}
 
-            {/* WHATSAPP */}
+            {/* WHATSAPP CORRIGIDO (API OFICIAL) */}
             <a
-              href={`https://wa.me/55${numeroWhatsApp || '84988880000'}?text=Olá,%20gostaria%20de%20mais%20informações!`}
+              href={urlWhatsapp}
               target="_blank"
               rel="noreferrer"
               className="p-1.5 rounded-lg text-zinc-400 hover:text-[#25D366] hover:bg-zinc-900 transition-all duration-300 hover:scale-110"
