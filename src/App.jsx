@@ -81,15 +81,17 @@ export default function App() {
   const [quemSomos, setQuemSomos] = useState({ historia: '', missao: '', visao: '', valores: '' });
 
   const [configSede, setConfigSede] = useState({
+    bannerTag: 'Tradição & Disciplina',
+    bannerTitulo: 'Associação Nagashima',
+    bannerSlogan: 'Artes Marciais, Esporte e Cultura',
+    bannerSubtitulo: 'Formando Campeões Dentro e Fora do Tatame',
+    bannerDescricao: 'Portal oficial da Associação Nagashima. Acompanhe o progresso dos nossos atletas, exames de faixa e próximos campeonatos.',
+    bannerLogo: '',
     endereco: 'R. Saturno, 102, 59106-220',
     bairroCidade: 'Igapó - Natal/RN',
     horarioJudo: 'Segundas, Quartas e Sextas: 19h00 às 20h30',
     horarioGeral: 'Terças e Quintas (Infantil): 18h00 às 19h00',
-    telefone: '',
-    email: '',
-    facebook: '',
-    instagram: '',
-    youtube: ''
+    telefone: '', email: '', facebook: '', instagram: '', youtube: ''
   });
 
   useEffect(() => {
@@ -122,13 +124,8 @@ export default function App() {
     });
 
     return () => {
-      unsubAtletas();
-      unsubEventos();
-      unsubAvisos();
-      unsubApoiadores();
-      unsubExames();
-      unsubQuemSomos();
-      unsubSede();
+      unsubAtletas(); unsubEventos(); unsubAvisos(); unsubApoiadores();
+      unsubExames(); unsubQuemSomos(); unsubSede();
     };
   }, []);
 
@@ -187,23 +184,23 @@ export default function App() {
               <section className="relative rounded-2xl bg-gradient-to-r from-zinc-900 via-zinc-900 to-red-950/40 border border-zinc-800 p-6 sm:p-12 flex flex-col md:flex-row items-center justify-between gap-8 shadow-2xl overflow-hidden">
                 <div className="max-w-2xl space-y-4 text-center md:text-left">
                   <span className="inline-block bg-red-600/20 text-red-500 text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full border border-red-600/30">
-                    Tradição & Disciplina
+                    {configSede.bannerTag || 'Tradição & Disciplina'}
                   </span>
 
                   <div className="space-y-1">
                     <h1 className="text-2xl sm:text-5xl font-black uppercase text-white tracking-wider" style={{ fontFamily: "'Shojumaru', cursive, serif" }}>
-                      Associação Nagashima
+                      {configSede.bannerTitulo || 'Associação Nagashima'}
                     </h1>
                     <p className="text-xs sm:text-sm font-semibold tracking-widest text-red-500 uppercase">
-                      Artes Marciais, Esporte e Cultura
+                      {configSede.bannerSlogan || 'Artes Marciais, Esporte e Cultura'}
                     </p>
                   </div>
 
                   <h2 className="text-base sm:text-2xl font-bold uppercase tracking-tight text-zinc-200 pt-2">
-                    Formando Campeões Dentro e Fora do Tatame
+                    {configSede.bannerSubtitulo || 'Formando Campeões Dentro e Fora do Tatame'}
                   </h2>
                   <p className="text-zinc-400 text-xs sm:text-base leading-relaxed">
-                    Portal oficial da Associação Nagashima. Acompanhe o progresso dos nossos atletas, exames de faixa e próximos campeonatos.
+                    {configSede.bannerDescricao || 'Portal oficial da Associação Nagashima. Acompanhe o progresso dos nossos atletas, exames de faixa e próximos campeonatos.'}
                   </p>
 
                   <div className="pt-2 flex flex-wrap gap-3 justify-center md:justify-start">
@@ -217,7 +214,7 @@ export default function App() {
                 </div>
 
                 <div className="w-36 h-36 sm:w-64 sm:h-64 rounded-full border-4 border-red-600 bg-white p-2 shadow-2xl flex-shrink-0">
-                  <img src={logoImg} alt="Logo Nagashima" className="w-full h-full object-contain rounded-full" />
+                  <img src={configSede.bannerLogo || logoImg} alt="Logo Banner" className="w-full h-full object-contain rounded-full" />
                 </div>
               </section>
 
@@ -283,7 +280,7 @@ export default function App() {
                 </div>
               </section>
 
-              {/* SEÇÃO DE PATROCINADORES OFICIAIS COM CONTATO E ENDEREÇO */}
+              {/* SEÇÃO DE PATROCINADORES OFICIAIS */}
               <section className="pt-6 border-t border-zinc-900 space-y-6">
                 <div className="text-center space-y-1">
                   <h2 className="text-xl sm:text-2xl font-black uppercase text-red-600 tracking-wider">
@@ -304,18 +301,13 @@ export default function App() {
                           {ap.nome}
                           {(ap.siteUrl || ap.mapsUrl) && <ExternalLink size={12} className="text-zinc-500 group-hover:text-red-400" />}
                         </h3>
-
-                        {ap.descricao && (
-                          <p className="text-xs text-zinc-300 leading-relaxed">{ap.descricao}</p>
-                        )}
-
+                        {ap.descricao && <p className="text-xs text-zinc-300 leading-relaxed">{ap.descricao}</p>}
                         {ap.celular && (
                           <p className="text-[11px] text-zinc-400 flex items-center gap-1.5 pt-1">
                             <Phone size={12} className="text-red-500 flex-shrink-0" />
                             <span>{ap.celular}</span>
                           </p>
                         )}
-
                         {ap.endereco && (
                           <p className="text-[11px] text-zinc-400 flex items-center gap-1.5">
                             <MapPin size={12} className="text-red-500 flex-shrink-0" />
