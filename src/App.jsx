@@ -182,7 +182,7 @@ export default function App() {
           {activePage === 'home' && (
             <div className="space-y-6 sm:space-y-10">
               
-              {/* BANNER PRINCIPAL RESPONSIVO ESTILO MIRANDA */}
+              {/* BANNER PRINCIPAL RESPONSIVO */}
               <section className="relative rounded-2xl bg-gradient-to-br from-zinc-900 via-zinc-900 to-red-950/60 border border-zinc-800 p-5 sm:p-10 flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl overflow-hidden">
                 <div className="max-w-2xl space-y-3 sm:space-y-4 text-center md:text-left w-full">
                   <span className="inline-block bg-red-600/20 text-red-500 text-[11px] sm:text-xs font-black uppercase tracking-widest px-3 py-1 rounded-full border border-red-600/30">
