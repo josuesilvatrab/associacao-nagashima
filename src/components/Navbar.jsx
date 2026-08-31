@@ -19,7 +19,7 @@ export default function Navbar({ activePage, setActivePage, onOpenLogin, configS
       <header className="bg-zinc-950/95 backdrop-blur-md border-b border-zinc-900 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
           
-          {/* LADO ESQUERDO: BOTÃO MENU NO MOBILE / REDES NO COMPUTADOR */}
+          {/* LADO ESQUERDO: BOTÃO MENU NO MOBILE / REDES SOCIAIS NO PC */}
           <div className="flex items-center gap-3">
             <button
               onClick={() => setMobileMenuOpen(true)}
@@ -27,38 +27,47 @@ export default function Navbar({ activePage, setActivePage, onOpenLogin, configS
               aria-label="Abrir Menu"
             >
               <Menu size={20} className="text-red-500" />
-              <span className="text-xs font-bold uppercase tracking-wider">Menu</span>
+              <span className="text-xs font-extrabold uppercase tracking-wider">Menu</span>
             </button>
 
-            {/* REDES SOCIAIS (Apenas no Computador) */}
-            <div className="hidden lg:flex items-center gap-2 text-xs text-zinc-400">
-              <span className="font-bold uppercase tracking-wider text-[11px] text-zinc-500">Redes:</span>
-              {configSede?.facebook && (
-                <a href={configSede.facebook} target="_blank" rel="noreferrer" className="p-1.5 rounded-lg text-zinc-400 hover:text-[#1877F2]">
+            {/* REDES SOCIAIS (Exibe ícones sempre, com link ativo ou estado opaco se não cadastrado) */}
+            <div className="hidden lg:flex items-center gap-1.5 text-xs text-zinc-400">
+              <span className="font-bold uppercase tracking-wider text-[11px] text-zinc-500 mr-1">Redes:</span>
+              
+              {configSede?.facebook ? (
+                <a href={configSede.facebook} target="_blank" rel="noreferrer" className="p-1.5 rounded-lg text-zinc-400 hover:text-[#1877F2] hover:bg-zinc-900 transition-all">
                   <Facebook size={18} />
                 </a>
+              ) : (
+                <span className="p-1.5 text-zinc-700 opacity-40 cursor-not-allowed" title="Facebook não cadastrado">
+                  <Facebook size={18} />
+                </span>
               )}
-              {configSede?.instagram && (
-                <a href={configSede.instagram} target="_blank" rel="noreferrer" className="p-1.5 rounded-lg text-zinc-400 hover:text-[#E4405F]">
+
+              {configSede?.instagram ? (
+                <a href={configSede.instagram} target="_blank" rel="noreferrer" className="p-1.5 rounded-lg text-zinc-400 hover:text-[#E4405F] hover:bg-zinc-900 transition-all">
                   <Instagram size={18} />
                 </a>
+              ) : (
+                <span className="p-1.5 text-zinc-700 opacity-40 cursor-not-allowed" title="Instagram não cadastrado">
+                  <Instagram size={18} />
+                </span>
               )}
-              {configSede?.youtube && (
-                <a href={configSede.youtube} target="_blank" rel="noreferrer" className="p-1.5 rounded-lg text-zinc-400 hover:text-[#FF0000]">
+
+              {configSede?.youtube ? (
+                <a href={configSede.youtube} target="_blank" rel="noreferrer" className="p-1.5 rounded-lg text-zinc-400 hover:text-[#FF0000] hover:bg-zinc-900 transition-all">
                   <Youtube size={18} />
                 </a>
+              ) : (
+                <span className="p-1.5 text-zinc-700 opacity-40 cursor-not-allowed" title="YouTube não cadastrado">
+                  <Youtube size={18} />
+                </span>
               )}
-              <a href={urlWhatsapp} target="_blank" rel="noreferrer" className="p-1.5 rounded-lg text-zinc-400 hover:text-[#25D366]">
+
+              <a href={urlWhatsapp} target="_blank" rel="noreferrer" className="p-1.5 rounded-lg text-zinc-400 hover:text-[#25D366] hover:bg-zinc-900 transition-all">
                 <MessageCircle size={18} />
               </a>
             </div>
-          </div>
-
-          {/* CENTRO: NOME DA ACADEMIA */}
-          <div className="cursor-pointer text-center" onClick={() => handleNavClick('home')}>
-            <h1 className="font-black text-sm sm:text-lg tracking-widest text-red-600 uppercase" style={{ fontFamily: "'Shojumaru', cursive, serif" }}>
-              NAGASHIMA
-            </h1>
           </div>
 
           {/* LADO DIREITO: NAVEGAÇÃO DESKTOP / BOTÃO ADMIN NO MOBILE */}
@@ -122,29 +131,25 @@ export default function Navbar({ activePage, setActivePage, onOpenLogin, configS
         </div>
       </header>
 
-      {/* PAINEL LATERAL DESLIZANTE PARA CELULAR (STYLE DRAWER IGUAL AO DA MIRANDA) */}
+      {/* PAINEL LATERAL DESLIZANTE PARA CELULAR */}
       {mobileMenuOpen && (
         <div className="fixed inset-0 z-50 flex lg:hidden">
-          {/* Fundo Escuro */}
           <div className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity" onClick={() => setMobileMenuOpen(false)} />
 
-          {/* Gaveta Lateral */}
           <div className="relative w-4/5 max-w-sm bg-zinc-950 border-r border-zinc-800 h-full p-6 flex flex-col justify-between shadow-2xl z-10 overflow-y-auto">
             <div className="space-y-6">
-              {/* Topo do Menu */}
               <div className="flex items-center justify-between border-b border-zinc-800 pb-4">
                 <div>
-                  <h2 className="font-black text-red-600 text-lg uppercase tracking-wider" style={{ fontFamily: "'Shojumaru', cursive, serif" }}>
+                  <h2 className="font-black text-red-600 text-base uppercase tracking-wider" style={{ fontFamily: "'Shojumaru', cursive, serif" }}>
                     NAGASHIMA
                   </h2>
-                  <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Artes Marciais</p>
+                  <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Navegação do Dojo</p>
                 </div>
                 <button onClick={() => setMobileMenuOpen(false)} className="p-2 text-zinc-400 hover:text-white bg-zinc-900 rounded-xl">
                   <X size={20} />
                 </button>
               </div>
 
-              {/* Botões do Menu Lateral */}
               <nav className="space-y-2">
                 <button
                   onClick={() => handleNavClick('home')}
@@ -198,7 +203,6 @@ export default function Navbar({ activePage, setActivePage, onOpenLogin, configS
               </nav>
             </div>
 
-            {/* Rodapé do Menu */}
             <div className="pt-6 border-t border-zinc-800 space-y-4">
               <button
                 onClick={() => { onOpenLogin(); setMobileMenuOpen(false); }}
@@ -207,23 +211,39 @@ export default function Navbar({ activePage, setActivePage, onOpenLogin, configS
                 <Lock size={16} className="text-red-500" /> Painel Administrativo
               </button>
 
+              {/* REDES SOCIAIS DENTRO DO MENU MOBILE */}
               <div className="flex items-center justify-center gap-3 pt-1">
-                {configSede?.facebook && (
-                  <a href={configSede.facebook} target="_blank" rel="noreferrer" className="p-2 bg-zinc-900 rounded-xl text-zinc-400 hover:text-[#1877F2]">
+                {configSede?.facebook ? (
+                  <a href={configSede.facebook} target="_blank" rel="noreferrer" className="p-2.5 bg-zinc-900 rounded-xl text-zinc-400 hover:text-[#1877F2]">
                     <Facebook size={18} />
                   </a>
+                ) : (
+                  <span className="p-2.5 bg-zinc-900 rounded-xl text-zinc-700 opacity-40">
+                    <Facebook size={18} />
+                  </span>
                 )}
-                {configSede?.instagram && (
-                  <a href={configSede.instagram} target="_blank" rel="noreferrer" className="p-2 bg-zinc-900 rounded-xl text-zinc-400 hover:text-[#E4405F]">
+
+                {configSede?.instagram ? (
+                  <a href={configSede.instagram} target="_blank" rel="noreferrer" className="p-2.5 bg-zinc-900 rounded-xl text-zinc-400 hover:text-[#E4405F]">
                     <Instagram size={18} />
                   </a>
+                ) : (
+                  <span className="p-2.5 bg-zinc-900 rounded-xl text-zinc-700 opacity-40">
+                    <Instagram size={18} />
+                  </span>
                 )}
-                {configSede?.youtube && (
-                  <a href={configSede.youtube} target="_blank" rel="noreferrer" className="p-2 bg-zinc-900 rounded-xl text-zinc-400 hover:text-[#FF0000]">
+
+                {configSede?.youtube ? (
+                  <a href={configSede.youtube} target="_blank" rel="noreferrer" className="p-2.5 bg-zinc-900 rounded-xl text-zinc-400 hover:text-[#FF0000]">
                     <Youtube size={18} />
                   </a>
+                ) : (
+                  <span className="p-2.5 bg-zinc-900 rounded-xl text-zinc-700 opacity-40">
+                    <Youtube size={18} />
+                  </span>
                 )}
-                <a href={urlWhatsapp} target="_blank" rel="noreferrer" className="p-2 bg-zinc-900 rounded-xl text-zinc-400 hover:text-[#25D366]">
+
+                <a href={urlWhatsapp} target="_blank" rel="noreferrer" className="p-2.5 bg-zinc-900 rounded-xl text-zinc-400 hover:text-[#25D366]">
                   <MessageCircle size={18} />
                 </a>
               </div>
