@@ -20,7 +20,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (usuario === 'admin' && senha === '1234') {
+    if (usuario === 'nagashima@2026!' && senha === 'N4g4shim4') {
       setErro(false);
       setUsuario('');
       setSenha('');
