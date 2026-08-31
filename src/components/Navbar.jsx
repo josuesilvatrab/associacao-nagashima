@@ -76,7 +76,7 @@ export default function Navbar({ activePage, setActivePage, onOpenLogin, configS
               </span>
             )}
 
-            {/* WHATSAPP CORRIGIDO (API OFICIAL) */}
+            {/* WHATSAPP */}
             <a
               href={urlWhatsapp}
               target="_blank"
@@ -89,17 +89,17 @@ export default function Navbar({ activePage, setActivePage, onOpenLogin, configS
           </div>
         </div>
 
-        {/* BOTÃO HAMBÚRGUER (MOBILE) */}
+        {/* BOTÃO HAMBÚRGUER (EXCLUSIVO PARA CELULAR) */}
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="md:hidden p-2 text-zinc-300 hover:text-white bg-zinc-900 rounded-lg border border-zinc-800"
+          className="lg:hidden p-2 text-zinc-300 hover:text-white bg-zinc-900 rounded-lg border border-zinc-800"
           aria-label="Abrir Menu"
         >
           {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
         </button>
 
-        {/* MENU DESKTOP */}
-        <nav className="hidden md:flex items-center gap-1.5">
+        {/* MENU DESKTOP (ESCONDE NO CELULAR E TABLET) */}
+        <nav className="hidden lg:flex items-center gap-1.5">
           <button
             onClick={() => handleNavClick('home')}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-black uppercase transition-all ${
@@ -155,9 +155,9 @@ export default function Navbar({ activePage, setActivePage, onOpenLogin, configS
         </nav>
       </div>
 
-      {/* MENU MOBILE DROPDOWN */}
+      {/* MENU MOBILE EXPANSÍVEL */}
       {mobileMenuOpen && (
-        <nav className="md:hidden bg-zinc-950 border-b border-zinc-800 px-4 py-3 flex flex-col gap-2">
+        <nav className="lg:hidden bg-zinc-950 border-b border-zinc-800 px-4 py-3 flex flex-col gap-2">
           <button
             onClick={() => handleNavClick('home')}
             className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-black uppercase transition-all ${
