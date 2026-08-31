@@ -7,7 +7,7 @@ export default function Navbar({ activePage, setActivePage, onOpenLogin, configS
   // Tratamento do número do WhatsApp
   const apenasNumeros = configSede?.telefone ? configSede.telefone.replace(/\D/g, '') : '';
   const numeroValido = apenasNumeros.length >= 10 ? apenasNumeros : '84988880000';
-  const urlWhatsapp = `https://api.whatsapp.com/send?phone=55${numeroValido}&text=Olá,%20gostaria%20de%20mais%20informações!`;
+  const urlWhatsapp = `https://api.whatsapp.com/send?phone=55${numeroValido}&text=Olá,%20gostaria%20de%20mais%20informações%20sobre%20o%20projeto%20Nagashima!`;
 
   const handleNavClick = (page) => {
     setActivePage(page);
