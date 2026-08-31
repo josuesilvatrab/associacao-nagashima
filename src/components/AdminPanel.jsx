@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../firebase';
 import { collection, addDoc, doc, deleteDoc, updateDoc, setDoc, getDocs } from 'firebase/firestore';
-import { Settings, LogOut, Plus, Trash2, Edit2, MapPin, Clock, Share2, Phone, Mail, Bell, HeartHandshake, GraduationCap, Info } from 'lucide-react';
+import { Settings, LogOut, Plus, Trash2, Edit2, MapPin, Clock, Share2, Phone, Mail, Bell, HeartHandshake, GraduationCap, Info, Layout, Image } from 'lucide-react';
 
 export function formatarDataBR(dataISO) {
   if (!dataISO) return '';
@@ -51,8 +51,14 @@ export default function AdminPanel({ onLogout, atletas, eventos, avisos, configS
     valores: ''
   });
 
-  // Form Sede
+  // Form Sede e Banner
   const [formSede, setFormSede] = useState(configSede || {
+    bannerTag: 'Tradição & Disciplina',
+    bannerTitulo: 'Associação Nagashima',
+    bannerSlogan: 'Artes Marciais, Esporte e Cultura',
+    bannerSubtitulo: 'Formando Campeões Dentro e Fora do Tatame',
+    bannerDescricao: 'Portal oficial da Associação Nagashima. Acompanhe o progresso dos nossos atletas, exames de faixa e próximos campeonatos.',
+    bannerLogo: '',
     endereco: '',
     bairroCidade: '',
     horarioJudo: '',
@@ -251,7 +257,6 @@ export default function AdminPanel({ onLogout, atletas, eventos, avisos, configS
     }
   };
 
-  // Funções Avisos (Com Edição)
   const handleSalvarAviso = async (e) => {
     e.preventDefault();
     if (!tituloAviso || !conteudoAviso) return alert('Preencha o título e o conteúdo do aviso.');
@@ -298,7 +303,7 @@ export default function AdminPanel({ onLogout, atletas, eventos, avisos, configS
     try {
       await setDoc(doc(db, 'configuracoes', 'sede'), formSede);
       if (setConfigSede) setConfigSede(formSede);
-      alert('Configurações de Sede, Contatos e Redes Sociais salvas com sucesso!');
+      alert('Configurações de Sede, Banner, Logo, Contatos e Redes Sociais salvas com sucesso!');
     } catch (err) {
       alert('Erro ao salvar configurações.');
     }
@@ -1023,16 +1028,61 @@ export default function AdminPanel({ onLogout, atletas, eventos, avisos, configS
         </div>
       )}
 
-      {/* ABA SEDE & REDES & CONTATOS */}
+      {/* ABA SEDE, BANNER & REDES */}
       {activeTab === 'sede' && (
-        <form onSubmit={handleSalvarSede} className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 space-y-6 shadow-xl max-w-2xl mx-auto">
+        <form onSubmit={handleSalvarSede} className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 space-y-6 shadow-xl max-w-3xl mx-auto">
           <h2 className="font-extrabold uppercase text-white text-sm border-b border-zinc-800 pb-3 flex items-center gap-2">
-            <MapPin className="text-red-500" /> Configurações de Sede, Contatos e Redes
+            <Layout className="text-red-500" /> Configurações de Sede, Banner Principal e Redes
           </h2>
 
+          {/* BANNER PRINCIPAL (HOME) */}
           <div className="space-y-4">
             <h3 className="text-xs font-bold text-red-500 uppercase flex items-center gap-2">
-              <Phone size={14} /> Contatos Principais (Topo e Rodapé)
+              <Layout size={14} /> Textos e Logo do Banner Principal (Home)
+            </h3>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="text-xs font-bold text-zinc-400 block mb-1">Selo / Tag Superior</label>
+                <input type="text" value={formSede.bannerTag || ''} onChange={e => setFormSede({...formSede, bannerTag: e.target.value})} placeholder="ex: Tradição & Disciplina" className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-2.5 text-xs text-white focus:border-red-600 outline-none" />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-zinc-400 block mb-1">Título Principal (Grande)</label>
+                <input type="text" value={formSede.bannerTitulo || ''} onChange={e => setFormSede({...formSede, bannerTitulo: e.target.value})} placeholder="ex: Associação Nagashima" className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-2.5 text-xs text-white focus:border-red-600 outline-none" />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-zinc-400 block mb-1">Slogan Vermelho</label>
+                <input type="text" value={formSede.bannerSlogan || ''} onChange={e => setFormSede({...formSede, bannerSlogan: e.target.value})} placeholder="ex: Artes Marciais, Esporte e Cultura" className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-2.5 text-xs text-white focus:border-red-600 outline-none" />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-zinc-400 block mb-1">Subtítulo em Destaque</label>
+                <input type="text" value={formSede.bannerSubtitulo || ''} onChange={e => setFormSede({...formSede, bannerSubtitulo: e.target.value})} placeholder="ex: Formando Campeões Dentro e Fora do Tatame" className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-2.5 text-xs text-white focus:border-red-600 outline-none" />
+              </div>
+            </div>
+
+            <div>
+              <label className="text-xs font-bold text-zinc-400 block mb-1">Descrição Curta do Banner</label>
+              <textarea value={formSede.bannerDescricao || ''} onChange={e => setFormSede({...formSede, bannerDescricao: e.target.value})} rows="2" placeholder="Portal oficial da Associação Nagashima..." className="w-full bg-zinc-950 border border-zinc-800 rounded-lg p-2.5 text-xs text-white focus:border-red-600 outline-none" />
+            </div>
+
+            {/* CAMPO DE IMPORTAR FOTO DO BANNER */}
+            <div className="pt-2">
+              <label className="text-xs font-bold text-zinc-400 block mb-1 flex items-center gap-1.5">
+                <Image size={14} className="text-red-500" /> Logo / Imagem Circular do Banner
+              </label>
+              <input type="file" accept="image/*" onChange={e => handleFileUpload(e, (res) => setFormSede({...formSede, bannerLogo: res}))} className="w-full text-xs text-zinc-400 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-zinc-800 file:text-white hover:file:bg-zinc-700 cursor-pointer" />
+              {formSede.bannerLogo && (
+                <div className="mt-2 flex items-center gap-3">
+                  <img src={formSede.bannerLogo} alt="Preview Logo Banner" className="w-12 h-12 rounded-full object-contain border border-red-600 bg-white p-1" />
+                  <span className="text-[11px] text-emerald-400 font-bold">✓ Imagem carregada</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="space-y-4 pt-4 border-t border-zinc-800">
+            <h3 className="text-xs font-bold text-red-500 uppercase flex items-center gap-2">
+              <Phone size={14} /> Contatos Principais
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
