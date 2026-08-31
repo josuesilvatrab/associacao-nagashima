@@ -1,8 +1,15 @@
-import React, { useState } from 'react';
-import { User, Calendar, Home, Lock, Facebook, Instagram, Youtube, MessageCircle, Info, GraduationCap, Menu, X, ChevronRight } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { User, Calendar, Home, Lock, Facebook, Instagram, Youtube, MessageCircle, Info, GraduationCap, Trophy, Menu, X, ChevronRight } from 'lucide-react';
 
 export default function Navbar({ activePage, setActivePage, onOpenLogin, configSede }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Trava o scroll da página de fundo enquanto o menu mobile estiver aberto,
+  // evitando que o usuário role o conteúdo por trás do overlay sem perceber.
+  useEffect(() => {
+    document.body.style.overflow = mobileMenuOpen ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [mobileMenuOpen]);
 
   // Tratamento do número do WhatsApp
   const apenasNumeros = configSede?.telefone ? configSede.telefone.replace(/\D/g, '') : '';
@@ -117,6 +124,15 @@ export default function Navbar({ activePage, setActivePage, onOpenLogin, configS
               >
                 <GraduationCap size={14} /> Exames
               </button>
+
+              <button
+                onClick={() => handleNavClick('conquistas')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-black uppercase transition-all ${
+                  activePage === 'conquistas' ? 'bg-red-600 text-white shadow-md shadow-red-600/30' : 'text-zinc-400 hover:text-white hover:bg-zinc-900'
+                }`}
+              >
+                <Trophy size={14} /> Conquistas
+              </button>
             </nav>
 
             <button
@@ -198,6 +214,16 @@ export default function Navbar({ activePage, setActivePage, onOpenLogin, configS
                   }`}
                 >
                   <span className="flex items-center gap-3"><GraduationCap size={18} /> Exames de Faixa</span>
+                  <ChevronRight size={16} className="opacity-60" />
+                </button>
+
+                <button
+                  onClick={() => handleNavClick('conquistas')}
+                  className={`w-full flex items-center justify-between px-4 py-3.5 rounded-xl text-sm font-black uppercase transition-all ${
+                    activePage === 'conquistas' ? 'bg-red-600 text-white shadow-lg shadow-red-600/30' : 'bg-zinc-900/80 text-zinc-200 border border-zinc-800/80'
+                  }`}
+                >
+                  <span className="flex items-center gap-3"><Trophy size={18} /> Conquistas</span>
                   <ChevronRight size={16} className="opacity-60" />
                 </button>
               </nav>
