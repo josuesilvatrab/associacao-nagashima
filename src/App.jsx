@@ -283,6 +283,7 @@ export default function App() {
               </section>
 
               {/* SEÇÃO DE PATROCINADORES OFICIAIS */}
+              {apoiadores.length > 0 && (
               <section className="pt-6 border-t border-zinc-900 space-y-4">
                 <div className="text-center space-y-1">
                   <h2 className="text-lg sm:text-2xl font-black uppercase text-red-600 tracking-wider">
@@ -321,6 +322,7 @@ export default function App() {
                   ))}
                 </div>
               </section>
+              )}
             </div>
           )}
 
@@ -492,6 +494,11 @@ export default function App() {
               <h2 className="text-lg sm:text-2xl font-black uppercase text-white tracking-wider flex items-center gap-2">
                 <Calendar className="text-red-500" /> Calendário de Eventos & Torneios
               </h2>
+              {eventos.length === 0 ? (
+                <div className="p-8 text-center bg-zinc-900 border border-zinc-800 rounded-xl text-zinc-500 text-sm">
+                  Nenhum evento cadastrado no momento.
+                </div>
+              ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {eventos.map(e => (
                   <div key={e.id} className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 sm:p-6 space-y-3 shadow-xl">
@@ -516,6 +523,7 @@ export default function App() {
                   </div>
                 ))}
               </div>
+              )}
             </div>
           )}
 
@@ -601,6 +609,11 @@ export default function App() {
               <h2 className="text-lg sm:text-2xl font-black uppercase text-white tracking-wider flex items-center gap-2 border-b border-zinc-800 pb-3">
                 <GraduationCap className="text-red-500" /> Exames de Faixa & Graduação
               </h2>
+              {exames.length === 0 ? (
+                <div className="p-8 text-center bg-zinc-900 border border-zinc-800 rounded-xl text-zinc-500 text-sm">
+                  Nenhum exame de faixa agendado no momento.
+                </div>
+              ) : (
               <div className="space-y-4 sm:space-y-6">
                 {exames.map(ex => (
                   <div key={ex.id} className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 sm:p-6 space-y-4 shadow-xl">
@@ -633,6 +646,7 @@ export default function App() {
                   </div>
                 ))}
               </div>
+              )}
             </div>
           )}
         </main>
